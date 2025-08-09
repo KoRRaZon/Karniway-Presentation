@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block content %}
+<div>
+    <form method="post" action="{% url 'wiki:post_create' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+    </form>
+</div>
+
+
+{% endblock %}

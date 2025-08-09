@@ -1,0 +1,23 @@
+{% load static %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% include 'header.html' %}
+
+    <div class="layout">
+      {% include 'sidebar.html' %}
+      <main class="main-container">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+
+    {% include 'footer.html' %}
+
+</body>
+</html>

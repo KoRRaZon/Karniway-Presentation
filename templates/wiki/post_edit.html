@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block content %}
+<div>
+    <a href="{% url 'wiki:post_list' %}">Вернуться</a>
+</div>
+<div>
+    <form method="post" action="{% url 'wiki:post_edit' post.slug %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Сохранить изменения</button>
+    </form>
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,54 @@
+.main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    padding: 40px;
+}
+
+/* Каждый пост */
+.post {
+    border: 1px solid grey;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #1e1e1e;
+    box-shadow: 0 2px 4px rgba(255, 255, 255, 0.05);
+    transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+/* Эффект наведения */
+.post:hover {
+    transform: scale(1.005);
+    box-shadow: 0 4px 8px rgba(255, 255, 255, 0.15);
+}
+
+/* Заголовок и рейтинг */
+.post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0px;
+}
+
+.post-header h2 {
+    font-size: 1.5rem;
+    margin: 0;
+    color: white;
+}
+
+.post-header p {
+    font-size: 1rem;
+    color: #ccc;
+}
+
+/* Тело поста с обрезкой */
+.post-body p {
+    color: #ddd;
+    line-height: 1.5;
+    margin: 0;
+
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Количество строк до обрезки */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}

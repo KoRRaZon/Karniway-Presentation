@@ -1,0 +1,25 @@
+<header>
+    <h2>Karniway</h2>
+
+    <div class="authenticate-nav">
+        <nav class="main-nav">
+            <a href="#">Главная</a>
+            <a href="#">Кампании</a>
+            <a href="#">Магазин</a>
+            <a href="#">Профиль</a>
+        </nav>
+
+        {% if user.is_authenticated %}
+        <nav class="login-nav">
+            <a href="#">Профиль</a>
+            <a href="#">Выйти</a>
+        </nav>
+        {% else %}
+        <nav class="login-nav">
+            <a href="#">Войти</a>
+            <a href="#">Регистрация</a>
+        </nav>
+        {% endif %}
+    </div>
+
+</header>

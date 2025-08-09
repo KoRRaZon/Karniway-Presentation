@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block extra_css %}
+
+{% endblock %}
+
+{% block content %}
+<p>slug: {{post.slug}}</p>
+<div>
+    <a href="{% url 'wiki:post_list' %}">Назад</a>
+    <hr>
+    <a href="{% url 'wiki:post_edit' post.slug %}">Редактировать</a>
+</div>
+<div>
+    <h2>{{ post.title }}</h2>
+    <p>{{ post.author }}</p>
+    <p>{{ post.rating }}</p>
+    <p>{{ post.text }}</p>
+</div>
+
+
+{% endblock %}
