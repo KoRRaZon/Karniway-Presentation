@@ -93,10 +93,10 @@ class CreatureCreateView(CreateView):
         context = super().get_context_data(**kwargs)
         if self.request.method == 'POST':
             context['attack_formset'] = CreatureAttackFormSet(self.request.POST, prefix="attack")
-            context['passive-formset'] = CreaturePassiveFormSet(self.request.POST, prefix="passive")
+            context['passive_formset'] = CreaturePassiveFormSet(self.request.POST, prefix="passive")
         else:
             context['attack_formset'] = CreatureAttackFormSet(prefix="attack")
-            context['passive-formset'] = CreaturePassiveFormSet(prefix="passive")
+            context['passive_formset'] = CreaturePassiveFormSet(prefix="passive")
         return context
 
     def form_valid(self, form):
@@ -104,7 +104,7 @@ class CreatureCreateView(CreateView):
         attack_formset = context['attack_formset']
         passive_formset = context['passive_formset']
 
-        if not attack_formset.is_valid() and passive_formset.is_valid():
+        if not attack_formset.is_valid() or passive_formset.is_valid():
             return self.form_invalid(form)
 
         with transaction.atomic():
@@ -133,7 +133,7 @@ class CreatureUpdateView(UpdateView):
 
         if self.request.method == 'POST':
             context['attack_formset'] = CreatureAttackFormSet(self.request.POST, instance=creature, prefix="attack")
-            context['passive-formset'] = CreaturePassiveFormSet(self.request.Post, instance=creature, prefix="passive")
+            context['passive-formset'] = CreaturePassiveFormSet(self.request.POST, instance=creature, prefix="passive")
         else:
             context['attack_formset'] = CreatureAttackFormSet(instance=creature, prefix="attack")
             context['passive-formset'] = CreaturePassiveFormSet(instance=creature, prefix="passive")
@@ -145,7 +145,7 @@ class CreatureUpdateView(UpdateView):
         attack_formset = context['attack_formset']
         passive_formset = context['passive_formset']
 
-        if not attack_formset.is_valid() and passive_formset.is_valid():
+        if not attack_formset.is_valid() or passive_formset.is_valid():
             return self.form_invalid(form)
 
         with transaction.atomic():
