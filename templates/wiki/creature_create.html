@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/creature_create.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="page">
+  <h1 class="title">{{ title }}</h1>
+
+  <form method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}<div class="card">{{ form.non_field_errors }}</div>{% endif %}
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>Основное</h3>
+        {{ form.name.errors }} <label>Название {{ form.name }}</label>
+        {{ form.description.errors }} <label>Описание {{ form.description }}</label>
+        <div class="row">
+          <div>{{ form.image.errors }} <label>Изображение {{ form.image }}</label></div>
+          <div>{{ form.category.errors }} <label>Категория {{ form.category }}</label></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Характеристики</h3>
+        <div class="row">
+          <div>{{ form.health.errors }} <label>Хиты {{ form.health }}</label></div>
+          <div>{{ form.armor_class.errors }} <label>КД {{ form.armor_class }}</label></div>
+        </div>
+        <div class="row">
+          <div>{{ form.mastery.errors }} <label>Бонус мастерства {{ form.mastery }}</label></div>
+          <div>{{ form.speed.errors }} <label>Скорость {{ form.speed }}</label></div>
+        </div>
+        <div class="row">
+          <div>{{ form.size.errors }} <label>Размер {{ form.size }}</label></div>
+          <div>{{ form.dangerous_level.errors }} <label>Опасность {{ form.dangerous_level }}</label></div>
+        </div>
+        {{ form.saving_throws.errors }} <label>Спасброски {{ form.saving_throws }}</label>
+        {{ form.skills.errors }} <label>Навыки {{ form.skills }}</label>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:14px;">
+      <h3>Статы</h3>
+      <div class="row">
+        <div>{{ form.strength.errors }} <label>Сила {{ form.strength }}</label></div>
+        <div>{{ form.dexterity.errors }} <label>Ловкость {{ form.dexterity }}</label></div>
+      </div>
+      <div class="row">
+        <div>{{ form.body_condition.errors }} <label>Телосложение {{ form.body_condition }}</label></div>
+        <div>{{ form.intelligence.errors }} <label>Интеллект {{ form.intelligence }}</label></div>
+      </div>
+      <div class="row">
+        <div>{{ form.wisdom.errors }} <label>Мудрость {{ form.wisdom }}</label></div>
+        <div>{{ form.charisma.errors }} <label>Харизма {{ form.charisma }}</label></div>
+      </div>
+    </div>
+
+    {# ---------- Атаки ---------- #}
+    <div class="card" style="margin-top:14px;">
+      <div class="inline-header">
+        <h3 style="margin:0">Атаки</h3>
+        <button type="button" class="btn add"
+                onclick="addForm('{{ attack_formset.prefix }}','attack-formset','attack-empty')">+ Добавить атаку</button>
+      </div>
+
+      {{ attack_formset.management_form }}
+      <div id="attack-formset" class="inline-list">
+        {% for f in attack_formset %}
+          <div class="inline-form">
+            {% if f.non_field_errors %}<div class="errorlist">{{ f.non_field_errors }}</div>{% endif %}
+            <div class="row">
+              <div>{{ f.name.errors }} <label>Название {{ f.name }}</label></div>
+              <div>{{ f.text.errors }} <label>Описание {{ f.text }}</label></div>
+            </div>
+            {% if f.DELETE %}<label class="muted">{{ f.DELETE }} удалить</label>{% endif %}
+            {% for hidden in f.hidden_fields %}{{ hidden }}{% endfor %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+
+
+    {# ---------- Пассивы ---------- #}
+    <div class="card" style="margin-top:14px;">
+      <div class="inline-header">
+        <h3 style="margin:0">Пассивные способности</h3>
+        <button type="button" class="btn add"
+                onclick="addForm('{{ passive_formset.prefix }}','passive-formset','passive-empty')">+ Добавить пассив</button>
+      </div>
+
+      {{ passive_formset.management_form }}
+      <div id="passive-formset" class="inline-list">
+        {% for f in passive_formset %}
+          <div class="inline-form">
+            {% if f.non_field_errors %}<div class="errorlist">{{ f.non_field_errors }}</div>{% endif %}
+            <div class="row">
+              <div>{{ f.name.errors }} <label>Название {{ f.name }}</label></div>
+              <div>{{ f.text.errors }} <label>Описание {{ f.text }}</label></div>
+            </div>
+            {% if f.DELETE %}<label class="muted">{{ f.DELETE }} удалить</label>{% endif %}
+            {% for hidden in f.hidden_fields %}{{ hidden }}{% endfor %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <template id="passive-empty">
+      {{ passive_formset.empty_form.as_p|safe }}
+    </template>
+
+    <div class="btns">
+      <button class="btn primary" type="submit">Сохранить</button>
+      <a class="btn" href="{% url 'wiki:creature_list' %}">Отмена</a>
+    </div>
+  </form>
+</div>
+
+{# Шаблон пустой формы — используем template и |safe, чтобы не было \u003C ... #}
+<template id="attack-empty">
+  {{ attack_formset.empty_form.as_p|safe }}
+</template>
+
+<script>
+function addForm(prefix, containerId, templateId){
+  const totalInput = document.getElementById(`id_${prefix}-TOTAL_FORMS`);
+  const index = parseInt(totalInput.value, 10);
+  const tpl = document.getElementById(templateId).innerHTML.replace(/__prefix__/g, index);
+  const wrapper = document.createElement('div');
+  wrapper.className = 'inline-form';
+  wrapper.innerHTML = tpl;
+
+  // если в empty_form были <p> — перерисуем их красивее: p -> div + label
+  // (не обязательно, но делает внешний вид равномерным с остальными)
+  const container = document.getElementById(containerId);
+  container.appendChild(wrapper);
+  totalInput.value = index + 1;
+}
+</script>
+{% endblock %}

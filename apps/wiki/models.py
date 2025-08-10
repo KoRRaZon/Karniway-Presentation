@@ -9,6 +9,8 @@ class PostCategory(models.Model):
     name = models.CharField(max_length=50)
 
 
+
+
 class Post(IsDeletedModel):
     title = models.CharField(max_length=100)
     slug = models.SlugField(max_length=100, unique=True, null=True, blank=True)
@@ -32,6 +34,13 @@ class CreatureCategory(models.Model):
     name = models.CharField(max_length=50)
     image = models.ImageField(upload_to='creature_category_images/', null=True, blank=True)
 
+    class Meta:
+        ordering = ['name']
+        verbose_name = 'Категория существ'
+        verbose_name_plural = 'Категории существ'
+
+    def __str__(self):
+        return self.name
 
 CREATURE_SIZE_CHOICES = [
     ('tiny', 'Tiny'),
@@ -43,6 +52,7 @@ CREATURE_SIZE_CHOICES = [
 
 class Creature(IsDeletedModel):
     name = models.CharField('Название существа', max_length=50, unique=True)
+    slug = models.SlugField(max_length=100, unique=True, null=True, blank=True)
     description = models.TextField('Описание существа', max_length=1000)
     image = models.ImageField(upload_to='wiki/creature_images/', null=True, blank=True)
     category = models.ForeignKey(CreatureCategory, on_delete=models.CASCADE)
@@ -50,20 +60,20 @@ class Creature(IsDeletedModel):
     # characteristic fields
     health = models.PositiveIntegerField('Хиты', default=0)
     armor_class = models.PositiveIntegerField('КД', default=0)
-    speed = models.PositiveIntegerField('Скорость')
-    size = models.CharField(choices=CREATURE_SIZE_CHOICES)
-    saving_throws = models.CharField('Спасброски', max_length=500)
-    skills = models.CharField('Навыки', max_length=500)
-    dangerous_level = models.PositiveIntegerField('Опасность', choices=((i,i) for i in range(1,21)))
+    mastery = models.PositiveIntegerField('Бонус мастерства', choices=((i, f'+{i}') for i in range(1, 11)), default=10)
+    speed = models.PositiveIntegerField('Скорость', default=0)
+    size = models.CharField(choices=CREATURE_SIZE_CHOICES, default='')
+    saving_throws = models.CharField('Спасброски', max_length=500, default='')
+    skills = models.CharField('Навыки', max_length=500, default='')
+    dangerous_level = models.PositiveIntegerField('Опасность', choices=((i,i) for i in range(1,21)), default=0)
 
     # stats fields
-    mastery = models.PositiveIntegerField('Бонус мастерства', choices=((i, f'+{i}') for i in range(1,11)))
-    strength = models.PositiveIntegerField('Сила', choices=((i, i) for i in range(20, 0, -1)))
-    dexterity = models.PositiveIntegerField('Ловкость', choices=((i, i) for i in range(20, 0, -1)))
-    body_condition = models.PositiveIntegerField('Телосложение', choices=((i, i) for i in range(20, 0, -1)))
-    intelligence = models.PositiveIntegerField('Интеллект', choices=((i, i) for i in range(20, 0, -1)))
-    wisdom = models.PositiveIntegerField('Мудрость', choices=((i, i) for i in range(20, 0, -1)))
-    charisma = models.PositiveIntegerField('Харизма', choices=((i, i) for i in range(20, 0, -1)))
+    strength = models.PositiveIntegerField('Сила', choices=((i, i) for i in range(20, 0, -1)), default=10)
+    dexterity = models.PositiveIntegerField('Ловкость', choices=((i, i) for i in range(20, 0, -1)), default=10)
+    body_condition = models.PositiveIntegerField('Телосложение', choices=((i, i) for i in range(20, 0, -1)), default=10)
+    intelligence = models.PositiveIntegerField('Интеллект', choices=((i, i) for i in range(20, 0, -1)), default=10)
+    wisdom = models.PositiveIntegerField('Мудрость', choices=((i, i) for i in range(20, 0, -1)), default=10)
+    charisma = models.PositiveIntegerField('Харизма', choices=((i, i) for i in range(20, 0, -1)), default=10)
 
     def __str__(self):
         return self.name

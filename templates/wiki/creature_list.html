@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/creature_list.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1>{{ title }}</h1>
+    <a href="{% url 'wiki:creature_create' %}" class="add-creature">Добавить существо</a>
+</div>
+
+
+<div class="creature-grid">
+    {% for creature in creatures %}
+    <div class="creature-card">
+        {% if creature.image %}
+            <img src="{{ creature.image.url }}" alt="{{ creature.name }}" class="creature-img">
+        {% endif %}
+
+        <a href="{% url 'wiki:creature_detail' creature.slug %}">
+            <h2>{{ creature.name }}</h2>
+        </a>
+
+        <p><strong>Категория:</strong>
+            <a href="/">{{ creature.category }}</a></p>
+        <p class="dangerous-level"><strong>Опасность: </strong>{{ creature.dangerous_level }}</p>
+        <p>{{ creature.description }}</p>
+    </div>
+    {% empty %}
+        <p>Нет существ в бестиарии.</p>
+    {% endfor %}
+</div>
+{% endblock %}
