@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/spell.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="page">
+  <h1 class="title">{{ title }}</h1>
+
+  <div class="spell-layout">
+    {# LEFT: image + meta #}
+    <aside class="card">
+      {% if spell.image %}
+        <img class="thumb" src="{{ spell.image.url }}" alt="{{ spell.name }}">
+      {% endif %}
+
+      <div class="meta">
+        <div class="meta-row"><span class="meta-k">Категория</span><span class="meta-v">{{ spell.category }}</span></div>
+        <div class="meta-row"><span class="meta-k">Уровень</span><span class="meta-v">{{ spell.spell_level }}</span></div>
+        {% if spell.casting_time %}<div class="meta-row"><span class="meta-k">Время</span><span class="meta-v">{{ spell.casting_time }}</span></div>{% endif %}
+        {% if spell.distance %}<div class="meta-row"><span class="meta-k">Дистанция</span><span class="meta-v">{{ spell.distance }}</span></div>{% endif %}
+        {% if spell.duration %}<div class="meta-row"><span class="meta-k">Длительность</span><span class="meta-v">{{ spell.duration }}</span></div>{% endif %}
+        <div class="meta-row"><span class="meta-k">Требования</span><span class="meta-v">{{ spell.requirements }}</span></div>
+        <div class="meta-row"><span class="meta-k">Компоненты</span><span class="meta-v">{{ spell.special_components }}</span></div>
+      </div>
+    </aside>
+
+    {# RIGHT: description + effects #}
+    <section class="card">
+      <h3>Описание</h3>
+      <div class="prose">{{ spell.description|linebreaksbr }}</div>
+
+      <h3 style="margin-top:18px;">Эффекты</h3>
+        {% if effect_links %}
+          <ul class="effect-list">
+            {% for link in effect_links %}
+              <li class="effect-item">
+                <span class="badge">{{ link.effect.name }}</span>
+                {% if link.note %}
+                  <div class="note">{{ link.note }}</div>
+                  {# .note стилизуем так, чтобы переносы строк сохранились #}
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="muted">Эффекты не указаны.</p>
+        {% endif %}
+
+    </section>
+  </div>
+</div>
+{% endblock %}

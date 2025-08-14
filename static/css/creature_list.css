@@ -1,58 +1,119 @@
-.header {
-    display: flex;
-    gap: 1rem;
+/* ====================================================================== */
+/*  Bestiary / Creature List                                              */
+/*  Тёмная тема, 4-колоночная сетка с адаптивом, плавные ховеры.          */
+/* ====================================================================== */
+
+/* Палитра (используем те же переменные, что и на других страницах) */
+:root{
+  --bg:#0e0f12; --card:#15171c; --line:#262a31; --text:#e9edf2;
+  --muted:#9097a1; --accent:#6ea8fe; --shadow:0 6px 16px rgb(0 0 0 / .25);
 }
 
-/*Ссылка добавить существо*/
-.add-creature {
-    margin-top: 2.5rem;
-    color: #F5F5F5;
-    opacity: 0.2;
-    text-decoration: none;
-    font-size: 13px;
-    transition: color 0.2s ease;
+/* Заголовок и кнопка "Добавить существо" */
+.header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  margin:0 0 16px;
 }
 
+.header h1{ margin:0; font-size:28px; color:var(--text); }
 
-.creature-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 2rem;
+/* Кнопка-ссылка в общей стилистике */
+.add-creature{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:10px 14px;
+  border-radius:12px;
+  border:1px solid var(--accent);
+  background:#101217;
+  color:var(--text);
+  text-decoration:none;
+  transition: border-color .15s ease, transform .15s ease, box-shadow .15s ease;
+  box-shadow: var(--shadow);
+}
+.add-creature:hover{ transform:translateY(-2px); }
+.add-creature:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+
+/* === Сетка карточек ==================================================== */
+.creature-grid{
+  display:grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr)); /* 4 колонки по умолчанию */
+  gap:16px;
 }
 
-.creature-card {
-    background-color: #2a2a2a;
-    border: 1px solid #444;
-    border-radius: 10px;
-    padding: 1rem;
-    margin-bottom: 1.5rem;
-    max-width: 300px;
+/* Адаптив: 3 / 2 / 1 колонка */
+@media (max-width: 1400px){ .creature-grid{ grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 1200px){ .creature-grid{ grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 900px) { .creature-grid{ grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .creature-grid{ grid-template-columns: 1fr; } }
+
+/* === Карточка существа ================================================= */
+.creature-card{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:12px;
+  box-shadow: var(--shadow);
+  transition: border-color .15s ease, transform .15s ease, box-shadow .15s ease;
+  min-height: 100%;            /* для ровных колонок при разной высоте контента */
+}
+.creature-card:hover{ border-color:var(--accent); transform:translateY(-2px); }
+.creature-card:focus-within{ border-color:var(--accent); } /* подсветка при фокусе ссылки внутри */
+
+/* Превью: во всю ширину карточки, квадрат с обрезкой */
+.creature-img{
+  width:100%;
+  aspect-ratio: 1 / 1;         /* держим квадрат без фиксированных px */
+  object-fit:cover;
+  object-position:center;
+  border-radius:10px;
+  border:1px solid var(--line);
+  background:#101217;
 }
 
-.creature-card a {
-    color: #cb9c5d;
+/* Заголовок-ссылка: наследуем цвет, убираем подчёркивание */
+.creature-card a{
+  color:var(--text);
+  text-decoration:none;
+}
+.creature-card a:hover{ color:var(--accent); }
+.creature-card a:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+
+/* Имя существа */
+.creature-card h2{
+  margin:6px 0 4px;
+  font-size:18px;
+  line-height:1.2;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 
-.creature-card h2 {
-    margin-top: 0.5rem;
-    color: #f0c040;
+/* Мета-параметры */
+.creature-card p{
+  margin:2px 0;
+  color:var(--text);
 }
+.creature-card p strong{ color:var(--muted); font-weight:600; }
 
-.creature-card p {
-    margin: 0.3rem 0;
+/* Ссылка категории — лёгкий акцент */
+.creature-card p a{
+  color:var(--accent);
+  text-decoration:none;
+  border-bottom:1px dotted transparent;
 }
+.creature-card p a:hover{ border-bottom-color: var(--accent); }
 
-.dangerous-level {
-    font-size: 13px;
+/* Уровень опасности поменьше */
+.dangerous-level{ font-size:13px; color:var(--muted); }
+
+/* Описание: мягкая обрезка на 3 строки, чтобы сетка была ровнее */
+.creature-card p:last-child{
+  color:var(--muted);
+  display:-webkit-box;
+  -webkit-line-clamp:3;    /* количество видимых строк */
+  -webkit-box-orient:vertical;
+  overflow:hidden;
 }
-
-.creature-img {
-    width: 240px;
-    height: 240px;
-    object-fit: cover;
-    object-position: center;
-    display: block;
-    border-radius: 10px;
-    margin-bottom: 1rem;
-}
-

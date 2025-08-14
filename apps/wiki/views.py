@@ -5,7 +5,7 @@ from django.views.generic import ListView, DetailView, UpdateView, CreateView
 
 from apps.wiki.forms import PostEditForm, PostCreateForm, CreatureForm, CreatureAttackFormSet, \
     CreaturePassiveFormSet, SpellEffectFormSet, SpellForm
-from apps.wiki.models import Post, Creature, Spell
+from apps.wiki.models import Post, Creature, Spell, SpellEffectLink
 
 
 class PostListView(ListView):
@@ -183,7 +183,11 @@ class SpellDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = f'{self.object.name}'
-        context['effects'] = self.object.effects.all().order_by('spelleffectlink__pk', 'name')
+        context['effect_links'] = (SpellEffectLink.objects
+                                   .select_related('effect')
+                                   .filter(spell=self.object)
+                                   .order_by('pk'))
+
         return context
 
 class SpellCreateView(CreateView):
