@@ -1,6 +1,7 @@
 from django import forms
+from django.forms import inlineformset_factory
 
-from apps.wiki.models import Post, Creature, CreatureAttack, CreaturePassive
+from apps.wiki.models import Post, Creature, CreatureAttack, CreaturePassive, Spell, SpellEffectLink
 
 
 # Формы статей
@@ -65,6 +66,37 @@ CreaturePassiveFormSet = forms.inlineformset_factory(
     validate_max=True,
 )
 
+# Формы заклинаний
+
+class SpellForm(forms.ModelForm):
+    class Meta:
+        model = Spell
+        fields = ('name', 'category', 'description', 'image', 'spell_level', 'requirements', 'special_components')
+        widgets = {
+            'description': forms.Textarea(attrs={'rows': 6}),
+            'requirements': forms.Textarea(attrs={'rows': 2}),
+            'special_components': forms.Textarea(attrs={'rows': 2}),
+        }
+
+
+class SpellEffectLinkForm(forms.ModelForm):
+    class Meta:
+        model = SpellEffectLink
+        fields = ['effect', 'note']
+        widgets = {
+            'note': forms.Textarea(attrs={'rows': 6, 'style': 'resize: vertical'}),
+        }
+
+
+SpellEffectFormSet = inlineformset_factory(
+    parent_model=Spell,
+    model=SpellEffectLink,
+    form=SpellEffectLinkForm,
+    extra=1,
+    can_delete=True,
+    validate_max=False,
+    validate_min=False,
+)
 
 
 

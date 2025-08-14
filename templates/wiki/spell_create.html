@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page">
+  <h1>{{ view.object|default_if_none:"Создать заклинание" }}</h1>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {{ form.non_field_errors }}
+
+    <div class="card">
+      {{ form.name.errors }}       <label>Название {{ form.name }}</label>
+      {{ form.category.errors }}<label>Категория {{ form.category }}</label>
+      {{ form.spell_level.errors }}<label>Уровень {{ form.spell_level }}</label>
+      {{ form.requirements.errors }}<label>Требования {{ form.requirements }}</label>
+      {{ form.special_components.errors }}<label>Особые компоненты {{ form.special_components }}</label>
+      {{ form.description.errors }}<label>Описание {{ form.description }}</label>
+      {{ form.image.errors }}      <label>Картинка {{ form.image }}</label>
+    </div>
+
+    <div class="card">
+      <div class="inline-header">
+        <h3>Эффекты</h3>
+        <button type="button" class="btn add"
+                onclick="addForm('eff','eff-formset','eff-empty')">+ Добавить эффект</button>
+      </div>
+
+      {{ effect_formset.management_form }}
+      <div id="eff-formset" class="inline-list">
+        {% for f in effect_formset %}
+          <div class="inline-form">
+            {% for hidden in f.hidden_fields %}{{ hidden }}{% endfor %}
+            {{ f.non_field_errors }}
+            <div class="row">
+              <div>{{ f.effect.errors }} <label>Эффект {{ f.effect }}</label></div>
+              <div>{{ f.note.errors }}   <label>Заметка {{ f.note }}</label></div>
+            </div>
+            {% if f.DELETE %}<label class="muted">{{ f.DELETE }} удалить</label>{% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <template id="eff-empty">
+      {{ effect_formset.empty_form.as_p|safe }}
+    </template>
+
+    <div class="btns">
+      <button class="btn primary" type="submit">Сохранить</button>
+      <a class="btn" href="{% url 'wiki:spell_list' %}">Отмена</a>
+    </div>
+  </form>
+</div>
+
+<script>
+function addForm(prefix, containerId, templateId){
+  const total = document.getElementById(`id_${prefix}-TOTAL_FORMS`);
+  const idx = parseInt(total.value || "0", 10);
+  const html = document.getElementById(templateId).innerHTML.replace(/__prefix__/g, idx);
+  const wrap = document.createElement('div');
+  wrap.className = 'inline-form';
+  wrap.innerHTML = html;
+  document.getElementById(containerId).appendChild(wrap);
+  total.value = idx + 1;
+}
+</script>
+{% endblock %}
