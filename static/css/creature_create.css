@@ -1,165 +1,122 @@
-/* ==========================================================================
-   Karniway • Wiki / Creature
-   Визуальная тема и оформление форм/карточек
-   --------------------------------------------------------------------------
-   Файл: static/css/wiki_creature.css
-   ========================================================================== */
+/* ========================================================================== */
+/* Creature Create — layout & form                                            */
+/* ========================================================================== */
 
-/* ========== 1) Тема и переменные =================================================
-   Используем CSS Custom Properties (переменные). Их удобно переопределять для тем.
-   ---------------------------------------------------------------------------- */
-:root {
-  --bg:      #0e0f12;
-  --card:    #15171c;
-  --muted:   #9097a1;
-  --line:    #262a31;
-  --text:    #e9edf2;
-  --accent:  #6ea8fe;
-  --good:    #46c37b;
-  --danger:  #ff6b6b;
+:root{
+  --bg:#0e0f12; --card:#15171c; --muted:#9097a1; --line:#262a31; --text:#e9edf2;
+  --accent:#6ea8fe; --good:#46c37b; --danger:#ff6b6b;
+
+  /* размеры */
+  --page-px:24px;
+  --gap:14px;
+  --row-gap:12px;
+  --radius:16px;
 }
 
-/* Базовые цвета страницы */
-body {
-  background: var(--bg);
-  color: var(--text);
+/* базовая коробка */
+html{ box-sizing:border-box; }
+*, *::before, *::after{ box-sizing:inherit; }
+
+body{ background:var(--bg); color:var(--text); margin:0; }
+
+/* переопределяем базовые стили форм для этой страницы*/
+.page form {
+  max-width: none;      /* убираем лимит 500px */
+  width: 100%;          /* растягиваем на всю доступную ширину */
+  background: transparent;
+  border: 0;
+  padding: 0;
+  border-radius: 0;
 }
 
-/* ========== 2) Контейнер страницы и заголовки =================================== */
-.page {
-  /* ширина контента + отступ под левый сайдбар */
-  max-width: 1100px;
-  margin-left: 300px;
-  padding: 24px;
+/* 1) страница — на всю ширину рабочей области */
+.main-container .page,
+.page{
+  width:100%;
+  max-width:none;           /* убираем ограничение */
+  margin:0;                 /* убираем сдвиг под сайдбар — этим должен управлять общий layout */
+  padding: 15px 50px 0 50px;
+
 }
 
-.title {
-  font-size: 28px;
-  margin: 0 0 16px;
+.title{ font-size:28px; margin:0 0 16px; }
+
+/* 2) главная двухколоночная сетка
+   minmax(0, X) позволяет колонкам с textarea нормально сжиматься, а не выталкивать соседей */
+.main-form{
+  display:grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); /* левая шире правой */
+  gap:var(--gap);
+  align-items:start;
 }
 
-/* ========== 3) Грид-сетки (макет) =============================================== */
-.grid-2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
+/* на узких — одна колонка */
+@media (max-width:1024px){
+  .main-form{ grid-template-columns: 1fr; }
 }
 
-/* Адаптация сетки на узких экранах */
-@media (max-width: 960px) {
-  .grid-2 { grid-template-columns: 1fr; }
+/* 3) внутренние сетки */
+.grid-2{
+  display:grid;
+  grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+  gap:var(--gap);
+}
+@media (max-width:960px){ .grid-2{ grid-template-columns:1fr; } }
+
+.row{
+  display:grid;
+  grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+  gap:var(--row-gap);
+}
+@media (max-width:720px){ .row{ grid-template-columns:1fr; } }
+
+/* 4) карточки */
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:18px;
+  box-shadow:0 6px 16px rgb(0 0 0 / .25);
+}
+.card h3{ margin:0 0 12px; font-size:18px; }
+
+/* 5) поля формы */
+label{ display:block; font-size:13px; color:var(--muted); margin:6px 0 6px; }
+input[type="text"], input[type="number"], select, textarea, input[type="file"]{
+  width:100%;
+  background:#101217;
+  color:var(--text);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:10px 12px;
+  outline:none;
+}
+textarea{ min-height:120px; resize:vertical; } /* не растягиваем по ширине */
+
+/* 6) утилиты */
+.muted{ color:var(--muted); }
+.errorlist{ color:var(--danger); margin:.5rem 0; }
+
+/* 7) формсеты (атаки/пассивы) */
+.inline-header{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  margin-bottom:8px;
+}
+.inline-list{ display:grid; gap:10px; }
+.inline-form{
+  border:1px dashed var(--line);
+  border-radius:12px;
+  padding:12px;
+  background:#12141a;
 }
 
-/* Локальные строки из двух колонок (для полей) */
-.row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
+/* 8) кнопки */
+.btn{
+  display:inline-flex; align-items:center; gap:8px;
+  border:1px solid var(--line); background:#101217; color:var(--text);
+  padding:10px 14px; border-radius:12px; cursor:pointer; text-decoration:none;
 }
-
-@media (max-width: 720px) {
-  .row { grid-template-columns: 1fr; }
-}
-
-/* ========== 4) Карточки и базовые элементы ===================================== */
-.card {
-  background: var(--card);
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 18px;
-  box-shadow: 0 6px 16px rgb(0 0 0 / 0.25);
-}
-
-/* Заголовки внутри карточек */
-.card h3 {
-  margin: 0 0 12px;
-  font-size: 18px;
-}
-
-/* ========== 5) Формы: подписи и поля ввода ====================================== */
-label {
-  display: block;
-  font-size: 13px;
-  color: var(--muted);
-  margin: 6px 0 6px;
-}
-
-/* Единый стиль для инпутов/селектов/текстовых областей/загрузки файла */
-input[type="text"],
-input[type="number"],
-select,
-textarea,
-input[type="file"] {
-  width: 100%;
-  background: #101217;
-  color: var(--text);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 10px 12px;
-  outline: none;
-}
-
-/* Минимальная высота для текстовых областей */
-textarea {
-  min-height: 120px;
-}
-
-/* ========== 6) Текстовые утилиты и ошибки ======================================= */
-.muted {
-  color: var(--muted);
-}
-
-.errorlist {
-  color: var(--danger);
-  margin: 0.5rem 0;
-}
-
-/* ========== 7) Блоки формсетов (атаки/пассивы) ================================== */
-/* Заголовок блока с кнопкой "добавить" */
-.inline-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 8px;
-}
-
-/* Контейнер со списком строк формсета */
-.inline-list {
-  display: grid;
-  gap: 10px;
-}
-
-/* Оформление отдельной строки формсета */
-.inline-form {
-  border: 1px dashed var(--line);
-  border-radius: 12px;
-  padding: 12px;
-  background: #12141a;
-}
-
-/* ========== 8) Кнопки ============================================================ */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  border: 1px solid var(--line);
-  background: #101217;
-  color: var(--text);
-  padding: 10px 14px;
-  border-radius: 12px;
-  cursor: pointer;
-  text-decoration: none;
-}
-
-/* Модификаторы кнопок (границы цветом темы) */
-.btn.primary { border-color: var(--accent); }
-.btn.add     { border-color: var(--good); }
-.btn.danger  { border-color: var(--danger); }
-
-/* Контейнер для набора кнопок */
-.btns {
-  display: flex;
-  gap: 10px;
-  margin-top: 14px;
-}
+.btn.primary{ border-color:var(--accent); }
+.btn.add{ border-color:var(--good); }
+.btn.danger{ border-color:var(--danger); }
+.btns{ display:flex; gap:10px; margin-top:14px; }

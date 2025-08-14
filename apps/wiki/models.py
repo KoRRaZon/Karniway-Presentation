@@ -1,15 +1,15 @@
 from django.db import models
+from django.db.models import PositiveIntegerField
 
 from apps.accounts.models import CustomUser
 from apps.common.models import IsDeletedModel
 from apps.common.utils import unique_slugify
 
 
+# ПОСТЫ: Категории, Посты
+
 class PostCategory(models.Model):
     name = models.CharField(max_length=50)
-
-
-
 
 class Post(IsDeletedModel):
     title = models.CharField(max_length=100)
@@ -29,6 +29,8 @@ class Post(IsDeletedModel):
         self.slug = unique_slugify(self, self.title, self.slug)
         super().save(*args, **kwargs)
 
+
+# СУЩЕСТВА: Категории, существа, атаки, пассивные особенности
 
 class CreatureCategory(models.Model):
     name = models.CharField(max_length=50)
@@ -75,14 +77,28 @@ class Creature(IsDeletedModel):
     wisdom = models.PositiveIntegerField('Мудрость', choices=((i, i) for i in range(20, 0, -1)), default=10)
     charisma = models.PositiveIntegerField('Харизма', choices=((i, i) for i in range(20, 0, -1)), default=10)
 
+    class Meta:
+        ordering = ('name',)
+        verbose_name = 'Существо'
+        verbose_name_plural = 'Существа'
+
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        self.slug = unique_slugify(self, self.name, self.slug)
+        super().save(*args, **kwargs)
 
 
 class CreatureAttack(models.Model):
     creature = models.ForeignKey(Creature, on_delete=models.CASCADE, related_name='attacks')
     name = models.CharField('Название', max_length=20)
     text = models.TextField('Описание', max_length=200)
+
+    class Meta:
+        ordering = ('name',)
+        verbose_name = 'Атака существа'
+        verbose_name_plural = 'Атаки существ'
 
     def __str__(self):
         return self.name
@@ -93,8 +109,102 @@ class CreaturePassive(models.Model):
     name = models.CharField('Название', max_length=30)
     text = models.TextField('Описание', max_length=300)
 
+    class Meta:
+        ordering = ('name',)
+        verbose_name = 'Особенность существа'
+        verbose_name_plural = 'Особенности существ'
+
+
     def __str__(self):
         return self.name
+
+
+
+
+# ЗАКЛИНАНИЯ: Категории, заклинания, эффекты
+
+
+class SpellCategory(models.Model):
+    name = models.CharField(max_length=50)
+    slug = models.SlugField(max_length=60, unique=True, null=True, blank=True)
+    image = models.ImageField(upload_to='wiki/spell_category_images/', null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        self.slug = unique_slugify(self, self.name, self.slug)
+        super().save(*args, **kwargs)
+
+class SpellEffect(models.Model):
+    name = models.CharField(max_length=50)
+    slug = models.SlugField(max_length=60, unique=True, null=True, blank=True)
+    text = models.TextField(max_length=500)
+
+    class Meta:
+        ordering = ('name',)
+        verbose_name = 'Эффект заклинания'
+        verbose_name_plural = 'Эффекты заклинания'
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        self.slug = unique_slugify(self, self.name, self.slug)
+        super().save(*args, **kwargs)
+
+
+class SpellEffectLink(models.Model):
+    spell = models.ForeignKey('Spell', on_delete=models.CASCADE)
+    effect = models.ForeignKey(SpellEffect, on_delete=models.PROTECT)
+    note = models.TextField(max_length=500, null=True, blank=True)
+
+    class Meta:
+        unique_together = ('spell', 'effect')
+        ordering = ('id',)
+
+    def save(self, *args, **kwargs):
+        self.note = self.effect.text
+        super().save(*args, **kwargs)
+
+
+class Spell(IsDeletedModel):
+    name = models.CharField('Название', max_length=100)
+    slug = models.SlugField('URL', max_length=100, unique=True, null=True, blank=True)
+    category = models.ForeignKey(SpellCategory, on_delete=models.CASCADE, related_name='spells')
+    description = models.TextField('Описание', max_length=1000)
+    image = models.ImageField(upload_to='wiki/spell_images/', null=True, blank=True)
+    effects = models.ManyToManyField(SpellEffect, through='SpellEffectLink', related_name='spells', blank=True)
+
+    # Аспекты заклинания
+    casting_time = models.CharField('Время накладывания', max_length=100, null=True, blank=True)
+    distance = models.CharField('Дистанция', max_length=100, null=True, blank=True, help_text='На себя/10 футов/30 футов')
+    duration = models.CharField('Длительность', max_length=100, null=True, blank=True)
+    requirements = models.CharField('Требования', max_length=300, default='отсутствуют')
+    special_components = models.CharField('Особые компоненты', max_length=300, default='отсутствуют')
+    spell_level = models.CharField('Уровень заклинания', max_length=100, choices=(
+        ('заговор', 'Заговор'),
+        ('1', '1'),
+        ('2', '2'),
+        ('3', '3'),
+        ('4', '4'),
+        ('5', '5'),
+        ('6', '6'),
+    ))
+
+    class Meta:
+        ordering = ('name',)
+        verbose_name = 'Заклинание'
+        verbose_name_plural = 'Заклинания'
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        self.slug = unique_slugify(self, self.name, self.slug)
+        super().save(*args, **kwargs)
+
+
 
 
 

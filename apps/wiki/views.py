@@ -1,11 +1,11 @@
 from django.db import transaction
 from django.shortcuts import render
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, DetailView, UpdateView, CreateView
 
 from apps.wiki.forms import PostEditForm, PostCreateForm, CreatureForm, CreatureAttackFormSet, \
-    CreaturePassiveFormSet
-from apps.wiki.models import Post, Creature
+    CreaturePassiveFormSet, SpellEffectFormSet, SpellForm
+from apps.wiki.models import Post, Creature, Spell
 
 
 class PostListView(ListView):
@@ -66,6 +66,7 @@ class CreatureListView(ListView):
     template_name = 'wiki/creature_list.html'
     context_object_name = 'creatures'
     extra_context = {'title': 'Бестиарий'}
+    paginate_by = 6
 
 
 class CreatureDetailView(DetailView):
@@ -159,6 +160,94 @@ class CreatureUpdateView(UpdateView):
 
 
 
+# ЗАКЛИНАНИЯ
+class SpellListView(ListView):
+    model = Spell
+    template_name = 'wiki/spell_list.html'
+    context_object_name = 'spells'
+    extra_context = {'title': 'Заклинания'}
+    paginate_by = 6
+
+
+class SpellDetailView(DetailView):
+    model = Spell
+    template_name = 'wiki/spell_detail.html'
+    context_object_name = 'spell'
+
+    def get_queryset(self):
+        return Spell.objects.select_related('category').prefetch_related('effects')
+
+    def get_object(self, **kwargs):
+        return Spell.objects.get(slug=self.kwargs['slug'])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = f'{self.object.name}'
+        context['effects'] = self.object.effects.all().order_by('spelleffectlink__pk', 'name')
+        return context
+
+class SpellCreateView(CreateView):
+    model = Spell
+    form_class = SpellForm
+    template_name = 'wiki/spell_create.html'
+    extra_context = {'title': 'Создание заклинания'}
+
+
+    def get_success_url(self):
+        return reverse('wiki:spell_detail', kwargs={'slug': self.object.slug})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.method == 'POST':
+            context['effect_formset'] = SpellEffectFormSet(self.request.POST, prefix="eff")
+        else:
+            context['effect_formset'] = SpellEffectFormSet(prefix="eff")
+        return context
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        formset = context['effect_formset']
+
+        if not formset.is_valid():
+            return self.form_invalid(form)
+
+        with transaction.atomic():
+            self.object = form.save()
+            formset.instance = self.object
+            formset.save()
+
+        return super().form_valid(form)
+
+
+class SpellUpdateView(UpdateView):
+    model = Spell
+    form_class = SpellForm
+    template_name = 'wiki/spell_create.html'
+    extra_context = {'title': 'Редактирование заклинания'}
+
+    def get_success_url(self):
+        return reverse('wiki:spell_detail', kwargs={'slug': self.object.slug})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.method == 'POST':
+            context['effect_formset'] = SpellEffectFormSet(self.request.POST, instance=self.object, prefix="eff")
+        else:
+            context['effect_formset'] = SpellEffectFormSet(instance=self.object, prefix="eff")
+        return context
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        formset = context['effect_formset']
+
+        if not formset.is_valid():
+            return self.form_invalid(form)
+
+        with transaction.atomic():
+            self.object = form.save()
+            formset.instance = self.object
+            formset.save()
+        return super().form_valid(form)
 
 
 

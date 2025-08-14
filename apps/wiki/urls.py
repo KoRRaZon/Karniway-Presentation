@@ -1,7 +1,7 @@
 from django.urls import path
 
 from apps.wiki.views import PostListView, PostDetailView, PostCreateView, PostEditView, \
-    CreatureListView, CreatureDetailView, CreatureCreateView
+    CreatureListView, CreatureDetailView, CreatureCreateView, SpellDetailView, SpellListView, SpellCreateView
 
 app_name = 'wiki'
 
@@ -15,4 +15,8 @@ urlpatterns = [
     path('creatures/', CreatureListView.as_view(), name='creature_list'),
     path('creatures/create/', CreatureCreateView.as_view(), name='creature_create'),
     path('creatures/<slug:slug>/', CreatureDetailView.as_view(), name='creature_detail'),
+
+    path('spells/', SpellListView.as_view(), name='spell_list'),
+    path('spells/create/', SpellCreateView.as_view(), name='spell_create'),
+    path('spells/<slug:slug>/', SpellDetailView.as_view(), name='spell_detail'),
 ]

@@ -1,10 +1,13 @@
 from django.contrib import admin
+from django.contrib.admin.widgets import AdminTextareaWidget
 from django.db import models
 from django import forms
 from django.db.models import Count
+from django.forms import Textarea
 from django.utils.safestring import mark_safe
 
-from apps.wiki.models import Post, Creature, CreatureAttack, CreaturePassive, CreatureCategory
+from apps.wiki.models import Post, Creature, CreatureAttack, CreaturePassive, CreatureCategory, Spell, SpellEffect, \
+    SpellCategory, SpellEffectLink
 
 
 @admin.register(Post)
@@ -123,3 +126,66 @@ class CreaturePassiveAdmin(admin.ModelAdmin):
     list_select_related = ("creature",)
     search_fields = ("name", "text", "creature__name")
     autocomplete_fields = ("creature",)
+
+
+
+# ЗАКЛИНАНИЯ
+
+
+class SpellEffectInline(admin.TabularInline):
+    model = SpellEffectLink
+    extra = 0
+    min_num = 0
+    autocomplete_fields = ("effect",)
+    fields = ("effect", "note",)
+    can_delete = True
+    ordering = ("pk",)
+
+
+@admin.register(Spell)
+class SpellAdmin(admin.ModelAdmin):
+    list_display = ("preview_image", "name", "category", "spell_level")
+    list_select_related = ("category",)
+    search_fields = ("name", "description",)
+    list_filter = ("category", "spell_level")
+
+    autocomplete_fields = ("category",)
+    save_on_top = True
+
+    readonly_fields = ("created_at", "updated_at")
+
+    fieldsets = (
+        ("Основное", {
+            "fields": (("name", "slug"), ("category", "spell_level"), "image", "requirements", "special_components", "description",),
+        }),
+        ("Дополнительно", {
+            "classes": ("collapse",),
+            "fields": ("created_at", "updated_at", "is_deleted", "deleted_at"),
+        })
+    )
+
+    inlines = [SpellEffectInline]
+
+    def preview_image(self, obj):
+        if obj.image:
+            return mark_safe(f'<img src="{obj.image.url}" style="max-height:30px;border-radius:8px;" />')
+        return "-"
+    preview_image.short_description = "Превью"
+
+
+@admin.register(SpellCategory)
+class SpellCategoryAdmin(admin.ModelAdmin):
+    list_display = ("preview_image", "name",)
+    search_fields = ("name",)
+
+    def preview_image(self, obj):
+        if obj.image:
+            return mark_safe(f'<img src="{obj.image.url}" style="max-height:50px;border-radius:8px;" />')
+        return "-"
+    preview_image.short_description = "Превью"
+
+@admin.register(SpellEffect)
+class SpellEffectAdmin(admin.ModelAdmin):
+    list_display = ("name",)
+    search_fields = ("name",)
+
