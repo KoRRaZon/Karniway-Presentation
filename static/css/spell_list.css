@@ -1,0 +1,76 @@
+/* ========================================================================== */
+/*  Spells / List                                                             */
+/* ========================================================================== */
+
+/* Цвета берем из :root, но дадим fallback на случай отсутствия */
+:root{
+  --bg:#0e0f12; --card:#15171c; --line:#262a31; --text:#e9edf2;
+  --muted:#9097a1; --accent:#3c5587;
+}
+
+.page{ width:100%; padding:24px; }
+.title{ font-size:28px; margin:0 0 16px; }
+.muted{ color:var(--muted); }
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.add-spell{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:10px 14px;
+  border-radius:12px;
+  border:1px solid var(--accent);
+  background:#101217;
+  color:var(--text);
+  text-decoration:none;
+  transition: border-color .15s ease, transform .15s ease, box-shadow .15s ease;
+  box-shadow: var(--shadow);
+}
+.add-spell:hover{ transform:translateY(-2px); }
+.add-spell:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+
+
+/* --- Грид: 6 колонок на десктопе, ниже — адаптив --- */
+.spell-grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* при repeat(6, minmax(0, 1fr)) у нас строго залоченная сетка*/
+  gap:16px;
+}
+
+@media (max-width: 1400px){ .spell-grid{ grid-template-columns: repeat(5, 1fr); } }
+@media (max-width: 1200px){ .spell-grid{ grid-template-columns: repeat(4, 1fr); } }
+@media (max-width: 900px) { .spell-grid{ grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 680px) { .spell-grid{ grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 420px) { .spell-grid{ grid-template-columns: 1fr; } }
+
+/* --- Карточка — ссылка целиком --- */
+.spell-card{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:10px 12px;
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:12px;
+  text-decoration:none;
+  color:var(--text);
+  box-shadow:0 6px 16px rgb(0 0 0 / .25);
+  transition: border-color .15s ease, transform .15s ease, box-shadow .15s ease;
+  min-height:68px;
+}
+
+.spell-card:hover{ border-color:var(--accent); transform: translateY(-2px); }
+.spell-card:focus-visible{
+  outline:2px solid var(--accent);
+  outline-offset:2px;
+}
+
+/* --- Картинка / плейсхолдер --- */
+.spell-img{
+  width:65px; height:65px;
+  border-radius:10px;
+  object-fit:cover

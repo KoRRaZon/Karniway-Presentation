@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/spell_list.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="page">
+    <div class="header">
+        <h1 class="title">{{ title }}</h1>
+        <a href="{% url 'wiki:spell_create' %}" class="add-spell">Добавить заклинание</a>
+    </div>
+
+
+    <div class="spell-grid">
+        {% for spell in spells %}
+        <a class="spell-card" href="{% url 'wiki:spell_detail' spell.slug %}">
+            {% if spell.image %}
+            <img src="{{ spell.image.url }}" alt="{{ spell.name }}" class="spell-img">
+            {% else %}
+            <div class="spell-img placeholder">{{ spell.name|first|upper }}</div>
+            {% endif %}
+            <span class="spell-name">{{ spell.name }}</span>
+        </a>
+        {% empty %}
+        <p class="muted">Заклинаний пока нет.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

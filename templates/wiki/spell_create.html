@@ -1,46 +1,77 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/spell.css' %}">
+{% endblock %}
+
 {% block content %}
 <div class="page">
-  <h1>{{ view.object|default_if_none:"Создать заклинание" }}</h1>
+  <h1 class="title">{{ title }}</h1>
 
-  <form method="post" enctype="multipart/form-data">
+  <form method="post" enctype="multipart/form-data" novalidate>
     {% csrf_token %}
+    {% if form.non_field_errors %}<div class="card">{{ form.non_field_errors }}</div>{% endif %}
 
-    {{ form.non_field_errors }}
+    <div class="main-form">
+      {# ============ LEFT COLUMN ============ #}
+      <div class="form-left">
+        <div class="grid-2">
+          <div class="card">
+            <h3>Основное</h3>
+            {{ form.name.errors }} <label>Название {{ form.name }}</label>
+            {{ form.description.errors }} <label>Описание {{ form.description }}</label>
 
-    <div class="card">
-      {{ form.name.errors }}       <label>Название {{ form.name }}</label>
-      {{ form.category.errors }}<label>Категория {{ form.category }}</label>
-      {{ form.spell_level.errors }}<label>Уровень {{ form.spell_level }}</label>
-      {{ form.requirements.errors }}<label>Требования {{ form.requirements }}</label>
-      {{ form.special_components.errors }}<label>Особые компоненты {{ form.special_components }}</label>
-      {{ form.description.errors }}<label>Описание {{ form.description }}</label>
-      {{ form.image.errors }}      <label>Картинка {{ form.image }}</label>
-    </div>
-
-    <div class="card">
-      <div class="inline-header">
-        <h3>Эффекты</h3>
-        <button type="button" class="btn add"
-                onclick="addForm('eff','eff-formset','eff-empty')">+ Добавить эффект</button>
-      </div>
-
-      {{ effect_formset.management_form }}
-      <div id="eff-formset" class="inline-list">
-        {% for f in effect_formset %}
-          <div class="inline-form">
-            {% for hidden in f.hidden_fields %}{{ hidden }}{% endfor %}
-            {{ f.non_field_errors }}
             <div class="row">
-              <div>{{ f.effect.errors }} <label>Эффект {{ f.effect }}</label></div>
-              <div>{{ f.note.errors }}   <label>Заметка {{ f.note }}</label></div>
+              <div>{{ form.image.errors }} <label>Изображение {{ form.image }}</label></div>
+              <div>{{ form.category.errors }} <label>Категория {{ form.category }}</label></div>
             </div>
-            {% if f.DELETE %}<label class="muted">{{ f.DELETE }} удалить</label>{% endif %}
           </div>
-        {% endfor %}
+
+          <div class="card">
+            <h3>Аспекты</h3>
+            <div class="row">
+              <div>{{ form.spell_level.errors }} <label>Уровень {{ form.spell_level }}</label></div>
+              {% if form.casting_time %}<div>{{ form.casting_time.errors }} <label>Время накладывания {{ form.casting_time }}</label></div>{% endif %}
+            </div>
+            <div class="row">
+              {% if form.distance %}<div>{{ form.distance.errors }} <label>Дистанция {{ form.distance }}</label></div>{% endif %}
+              {% if form.duration %}<div>{{ form.duration.errors }} <label>Длительность {{ form.duration }}</label></div>{% endif %}
+            </div>
+            {{ form.requirements.errors }} <label>Требования {{ form.requirements }}</label>
+            {{ form.special_components.errors }} <label>Особые компоненты {{ form.special_components }}</label>
+          </div>
+        </div>
+      </div>
+
+      {# ============ RIGHT COLUMN ============ #}
+      <div class="form-right">
+        <div class="card">
+          <div class="inline-header">
+            <h3 style="margin:0">Эффекты</h3>
+            <button type="button" class="btn add"
+                    onclick="addForm('eff','eff-formset','eff-empty')">+ Добавить эффект</button>
+          </div>
+
+          {{ effect_formset.management_form }}
+          <div id="eff-formset" class="inline-list">
+            {% for f in effect_formset %}
+              <div class="inline-form">
+                {% if f.non_field_errors %}<div class="errorlist">{{ f.non_field_errors }}</div>{% endif %}
+                {% for hidden in f.hidden_fields %}{{ hidden }}{% endfor %}
+                <div class="row">
+                  <div>{{ f.effect.errors }} <label>Эффект {{ f.effect }}</label></div>
+                  <div>{{ f.note.errors }}   <label>Заметка {{ f.note }}</label></div>
+                </div>
+                {% if f.DELETE %}<label class="muted">{{ f.DELETE }} удалить</label>{% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        </div>
       </div>
     </div>
 
+    {# шаблон пустой формы — чтобы не было \u003C используем |safe внутри <template> #}
     <template id="eff-empty">
       {{ effect_formset.empty_form.as_p|safe }}
     </template>

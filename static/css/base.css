@@ -102,15 +102,26 @@ header {
 /* ============================= */
 
 
-.layout {
-    display: flex;
-    min-height: 90vh;
+/* Контейнер всей страницы */
+.layout{
+  display: flex;
+  min-height: 90vh;
 }
 
-.main-container {
-    flex-grow: 1;
-    padding: 30px;
-    background-color: #252525;
+/* Фиксируем сайдбар: 250px, без роста и без сжатия */
+.sidebar{
+  flex: 0 0 250px;   /* ← эквивалентно: flex-grow:0; flex-shrink:0; flex-basis:250px */
+  width: 250px;      /* можно оставить для наглядности, но решает именно flex:0 0 250px */
+}
+
+/* Основная колонка: занимает остаток, и разрешаем ей сжиматься внутрь,
+   чтобы она не "выталкивала" соседа (сайдбар) */
+.main-container{
+  flex: 1 1 auto;    /* или просто flex: 1; */
+  min-width: 0;      /* ← критично! иначе грид/внутреннее содержимое задаёт min-content width
+                         и браузер начнёт сжимать сайдбар */
+  padding: 30px;
+  background-color: #252525;
 }
 
 
