@@ -1,0 +1,59 @@
+/* Обёртка контента страницы: центрируем и задаём дыхание */
+.delete-page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+/* Карточка с сообщением и действиями */
+.delete-card {
+  background: #2e2e2e;
+  border: 1px solid #3a3a3a;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, .25);
+}
+
+/* Заголовок/текст */
+.delete-title { margin: 0 0 10px; font-size: 24px; }
+.delete-text  { margin: 0 0 16px; color: #cfcfcf; }
+
+/* Превью */
+.delete-thumb {
+  display: block;
+  max-height: 120px;
+  border-radius: 8px;
+  border: 1px solid #3a3a3a;
+  margin-bottom: 14px;
+  object-fit: cover;
+}
+
+/* Кнопки действий */
+.delete-actions { margin-top: 10px; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  text-decoration: none;
+  cursor: pointer;
+  color: #fff;
+  background: #1f1f1f;
+  border: 1px solid #555;
+  transition: box-shadow .15s ease, transform .15s ease, border-color .15s ease;
+}
+
+.btn:hover { transform: translateY(-1px); }
+
+.btn-danger {
+  background: #2b2b2b;
+  border-color: #ff6b6b;
+}
+
+.btn-danger:hover {
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, .15);
+}
+
+.btn-muted { margin-left: 10px; }

@@ -2,107 +2,95 @@
 {% load static %}
 
 {% block extra_css %}
-<style>
-  :root{
-    --bg:#0e0f12; --card:#15171c; --muted:#9097a1; --line:#262a31; --text:#e9edf2; --accent:#6ea8fe;
-  }
-  body{ background:var(--bg); color:var(--text); }
-  .page{ max-width:1100px; margin:0 auto; padding:24px; }
-  .title{ font-size:28px; margin:0 0 16px; }
-  .detail-grid{ display:grid; grid-template-columns: 340px 1fr; gap:16px; }
-  @media (max-width: 1024px){ .detail-grid{ grid-template-columns:1fr; } }
-
-  .card{ background:var(--card); border:1px solid var(--line); border-radius:16px; padding:18px; box-shadow:0 6px 16px rgb(0 0 0 / .25); }
-  .thumb{ width:100%; border-radius:12px; object-fit:cover; }
-  .muted{ color:var(--muted); }
-  .grid{ display:grid; grid-template-columns: 1fr 1fr; gap:10px 14px; }
-  @media (max-width: 720px){ .grid{ grid-template-columns:1fr; } }
-  .mono{ font-family: ui-monospace, Menlo, Consolas, monospace; }
-  .list{ display:grid; gap:10px; }
-  .item{ border:1px dashed var(--line); border-radius:12px; padding:12px; background:#12141a; }
-  .btn{ display:inline-flex; align-items:center; gap:8px; border:1px solid var(--line); background:#101217; color:var(--text); padding:10px 14px; border-radius:12px; text-decoration:none; }
-</style>
+<link rel="stylesheet" href="{% static 'css/creature_detail.css' %}">
 {% endblock %}
 
 {% block content %}
 <div class="page">
-  <h1 class="title">{{ title }}</h1>
-
-  <div class="detail-grid">
-    <div class="card">
-      {% if creature.image %}
-        <img class="thumb" src="{{ creature.image.url }}" alt="{{ creature.name }}">
-      {% else %}
-        <img class="thumb" src="{% static 'admin/img/icon-unknown.svg' %}" alt="">
-      {% endif %}
-      <div class="muted" style="margin-top:10px;">
-        Категория: {{ creature.category.name }}<br>
-        Размер: {{ creature.get_size_display }} · Опасность: {{ creature.dangerous_level }}<br>
-        Бонус мастерства: {{ creature.get_mastery_display }}
-      </div>
+    <div class="page-header">
+        <h1 class="title">{{ title }}</h1>
+        <a class="btn adding" href="{% url 'wiki:creature_edit' creature.slug %}">Редактировать существо</a>
     </div>
+    <div class="detail-grid">
+        <div class="card">
+            {% if creature.image %}
+            <img class="thumb" src="{{ creature.image.url }}" alt="{{ creature.name }}">
+            {% else %}
+            <img class="thumb" src="{% static 'admin/img/icon-unknown.svg' %}" alt="">
+            {% endif %}
+            <div class="muted" style="margin-top:10px;">
+                Категория: {{ creature.category.name }}<br>
+                Размер: {{ creature.get_size_display }}<br>
+                Уровень опасности: {{ creature.dangerous_level }}<br>
+                Бонус мастерства: {{ creature.get_mastery_display }}
+            </div>
+        </div>
 
-    <div class="card">
-      <h3 style="margin-top:0">Описание</h3>
-      <p style="margin:0">{{ creature.description|linebreaksbr }}</p>
-    </div>
+        <div class="card">
+            <h3 style="margin-top:0">Описание</h3>
+            <p style="margin:0">{{ creature.description|linebreaksbr }}</p>
+        </div>
 
-    <div class="card">
-      <h3 style="margin-top:0">Характеристики</h3>
-      <div class="grid">
-        <div>Хиты</div><div class="mono">{{ creature.health }}</div>
-        <div>КД</div><div class="mono">{{ creature.armor_class }}</div>
-        <div>Скорость</div><div class="mono">{{ creature.speed }}</div>
-        <div>Спасброски</div><div class="mono">{{ creature.saving_throws }}</div>
-        <div>Навыки</div><div class="mono">{{ creature.skills }}</div>
-      </div>
-    </div>
+        <div class="card">
+            <h3 style="margin-top:0">Характеристики</h3>
+            <div class="grid">
+                <div>Хиты</div><div class="mono">{{ creature.health }}</div>
+                <div>КД</div><div class="mono">{{ creature.armor_class }}</div>
+                <div>Скорость</div><div class="mono">{{ creature.speed }}</div>
+                <div>Спасброски</div><div class="mono">{{ creature.saving_throws }}</div>
+                <div>Навыки</div><div class="mono">{{ creature.skills }}</div>
+            </div>
+        </div>
 
-    <div class="card">
-      <h3 style="margin-top:0">Параметры</h3>
-      <div class="grid">
-        <div>Сила</div><div class="mono">{{ creature.strength }}</div>
-        <div>Ловкость</div><div class="mono">{{ creature.dexterity }}</div>
-        <div>Телосложение</div><div class="mono">{{ creature.body_condition }}</div>
-        <div>Интеллект</div><div class="mono">{{ creature.intelligence }}</div>
-        <div>Мудрость</div><div class="mono">{{ creature.wisdom }}</div>
-        <div>Харизма</div><div class="mono">{{ creature.charisma }}</div>
-      </div>
-    </div>
+        <div class="card">
+            <h3 style="margin-top:0">Параметры</h3>
+            <div class="grid">
+                <div>Сила</div><div class="mono">{{ creature.strength }}</div>
+                <div>Ловкость</div><div class="mono">{{ creature.dexterity }}</div>
+                <div>Телосложение</div><div class="mono">{{ creature.body_condition }}</div>
+                <div>Интеллект</div><div class="mono">{{ creature.intelligence }}</div>
+                <div>Мудрость</div><div class="mono">{{ creature.wisdom }}</div>
+                <div>Харизма</div><div class="mono">{{ creature.charisma }}</div>
+            </div>
+        </div>
 
-    <div class="card">
-      <h3 style="margin-top:0">Атаки</h3>
-      {% with creature.attacks.all as attacks %}
-        {% if attacks %}
-          <div class="list">
-            {% for a in attacks %}
-              <div class="item"><strong>{{ a.name }}</strong><br>{{ a.text|linebreaksbr }}</div>
-            {% endfor %}
-          </div>
-        {% else %}
-          <div class="muted">Нет атак.</div>
-        {% endif %}
-      {% endwith %}
-    </div>
+        <div class="card">
+            <h3 style="margin-top:0">Атаки</h3>
+            {% with creature.attacks.all as attacks %}
+            {% if attacks %}
+            <div class="list">
+                {% for a in attacks %}
+                <div class="item"><strong>{{ a.name }}</strong><br>{{ a.text|linebreaksbr }}</div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="muted">Нет атак.</div>
+            {% endif %}
+            {% endwith %}
+        </div>
 
-    <div class="card">
-      <h3 style="margin-top:0">Пассивные способности</h3>
-      {% with creature.passives.all as passives %}
-        {% if passives %}
-          <div class="list">
-            {% for p in passives %}
-              <div class="item"><strong>{{ p.name }}</strong><br>{{ p.text|linebreaksbr }}</div>
-            {% endfor %}
-          </div>
-        {% else %}
-          <div class="muted">Нет пассивов.</div>
-        {% endif %}
-      {% endwith %}
-    </div>
+        <div class="card">
+            <h3 style="margin-top:0">Пассивные способности</h3>
+            {% with creature.passives.all as passives %}
+            {% if passives %}
+            <div class="list">
+                {% for p in passives %}
+                <div class="item"><strong>{{ p.name }}</strong><br>{{ p.text|linebreaksbr }}</div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="muted">Нет пассивов.</div>
+            {% endif %}
+            {% endwith %}
+        </div>
 
-    <div class="card">
-      <a class="btn" href="{% url 'wiki:creature_list' %}">← Вернуться к списку</a>
+        <div class="bottom-panel">
+            <div class="card">
+                <a class="btn" href="{% url 'wiki:creature_list' %}">← Вернуться к списку</a>
+            </div>
+            <a class="btn danger" href="{% url 'wiki:creature_delete' creature.slug %}">Удалить существо</a>
+        </div>
+
     </div>
-  </div>
 </div>
 {% endblock %}

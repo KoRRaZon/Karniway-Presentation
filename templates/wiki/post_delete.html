@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/delete_page.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="main-container">
+  <div class="delete-page">
+    <div class="delete-card">
+      <h1 class="delete-title">Удаление статьи</h1>
+
+      <p class="delete-text">
+        Вы действительно хотите удалить
+        <strong>{{ object.name }}</strong>? Это действие невозможно будет отменить.
+      </p>
+
+      {% if object.image %}
+        <img class="delete-thumb" src="{{ object.image.url }}" alt="{{ object.name }}">
+      {% endif %}
+
+      <form method="post" class="delete-actions">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Да, удалить</button>
+        <a href="{% url 'wiki:post_detail' object.slug %}" class="btn btn-muted">Отмена</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

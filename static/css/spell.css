@@ -4,7 +4,7 @@
 
 :root{
   --bg:#0e0f12; --card:#15171c; --muted:#9097a1; --line:#262a31; --text:#e9edf2;
-  --accent:#6ea8fe; --good:#46c37b; --danger:#ff6b6b;
+  --accent:#6ea8fe; --good:#46c37b; --danger:#ff6b6b; --adding:#6ea8fe;
 
   --page-px:24px;
   --gap:14px;
@@ -19,6 +19,19 @@ body{ background:var(--bg); color:var(--text); margin:0; }
 
 /* страница */
 .page{ width:100%; max-width:none; margin:0; padding:var(--page-px); }
+
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+/* ВРЕМЕННЫЙ костыль для кнопки "Назад" spell_edit. Стили работают для двух страниц. */
+.page-header1 {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
 .title{ font-size:28px; margin:0 0 16px; }
 
 /* карточки */
@@ -76,8 +89,15 @@ textarea{ min-height:120px; resize:vertical; }
       cursor:pointer; text-decoration:none; }
 .btn.primary{ border-color:var(--accent); }
 .btn.add{ border-color:var(--good); }
+.btn.adding{ border-color:var(--adding) }
 .btn.danger{ border-color:var(--danger); }
 .btns{ display:flex; gap:10px; margin-top:14px; }
+
+.btn{ display:inline-flex; align-items:center; gap:8px; border:1px solid var(--line); background:#101217; color:var(--text); padding:10px 14px; border-radius:12px; text-decoration:none; transition: border-color .15s ease, transform .15s ease, box-shadow .15s ease;}
+.btn:hover{ transform:translateY(-2px); }
+.btn:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+.bottom-panel{ grid-column: 1 /-1; display: flex; align-items: center; justify-content: space-between; }
+
 
 /* ---------- Detail: две области ---------- */
 .spell-layout{

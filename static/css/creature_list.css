@@ -61,7 +61,7 @@
   transition: border-color .15s ease, transform .15s ease, box-shadow .15s ease;
   min-height: 100%;            /* для ровных колонок при разной высоте контента */
 }
-.creature-card:hover{ border-color:var(--accent); transform:translateY(-2px); }
+
 .creature-card:focus-within{ border-color:var(--accent); } /* подсветка при фокусе ссылки внутри */
 
 /* Превью: во всю ширину карточки, квадрат с обрезкой */
@@ -80,8 +80,18 @@
   color:var(--text);
   text-decoration:none;
 }
-.creature-card a:hover{ color:var(--accent); }
-.creature-card a:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+/* Подсветка карточки при :hover и при фокусе любого поля внутри */
+.creature-card:is(:hover, :focus-within){
+  border-color: var(--accent);
+  transform: scale(1.015);
+}
+
+/* Ссылка-заголовок: подсвечивается как при ховере самой ссылки,
+   так и при ховере карточки целиком */
+.creature-card h2 a:hover,
+.creature-card:hover h2 a{
+  color: var(--accent);
+}
 
 /* Имя существа */
 .creature-card h2{

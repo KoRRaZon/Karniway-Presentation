@@ -1,5 +1,5 @@
 import uuid
-from datetime import timezone
+from django.utils import timezone
 
 from django.db import models
 
@@ -22,6 +22,8 @@ class IsDeletedModel(BaseModel):
     deleted_at = models.DateTimeField(null=True, blank=True)
 
     objects = IsDeletedManager()
+
+
 
     class Meta:
         abstract = True

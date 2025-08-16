@@ -1,24 +1,41 @@
 {% extends 'base.html' %}
-
 {% load static %}
 
 {% block extra_css %}
-
+<link rel="stylesheet" href="{% static 'css/post_detail.css' %}">
 {% endblock %}
 
 {% block content %}
-<p>slug: {{post.slug}}</p>
-<div>
-    <a href="{% url 'wiki:post_list' %}">Назад</a>
-    <hr>
-    <a href="{% url 'wiki:post_edit' post.slug %}">Редактировать</a>
-</div>
-<div>
-    <h2>{{ post.title }}</h2>
-    <p>{{ post.author }}</p>
-    <p>{{ post.rating }}</p>
-    <p>{{ post.text }}</p>
-</div>
+<div class="page">
 
+  <!-- Шапка статьи -->
+  <header class="article-header card">
+    <h1 class="article-title">{{ post.title }}</h1>
+    <div class="byline">
+      <span class="author">{{ post.author }}</span>
+      <span class="dot">•</span>
+      <time datetime="{{ post.created_at|date:'c' }}">{{ post.created_at|date:"d.m.Y" }}</time>
+      {% if post.rating %}
+        <span class="dot">•</span>
+        <span class="rating">Рейтинг: {{ post.rating }}</span>
+      {% endif %}
+    </div>
+  </header>
 
+  <!-- Основной текст -->
+  <article class="article card">
+    <div class="prose">
+      {{ post.text|linebreaks }}
+    </div>
+  </article>
+
+  <!-- Панель действий -->
+  <div class="bottom-panel">
+    <div class="card card--bare">
+      <a class="btn" href="{% url 'wiki:post_list' %}">← Вернуться к списку</a>
+    </div>
+    <a class="btn danger" href="{% url 'wiki:post_delete' post.slug %}">Удалить статью</a>
+  </div>
+
+</div>
 {% endblock %}

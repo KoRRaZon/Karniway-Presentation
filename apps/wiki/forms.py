@@ -5,13 +5,7 @@ from apps.wiki.models import Post, Creature, CreatureAttack, CreaturePassive, Sp
 
 
 # Формы статей
-class PostCreateForm(forms.ModelForm):
-    class Meta:
-        model = Post
-        fields = ['title', 'text', 'image']
-
-
-class PostEditForm(forms.ModelForm):
+class PostForm(forms.ModelForm):
     class Meta:
         model = Post
         fields = ['title', 'text', 'image']
@@ -82,7 +76,7 @@ class SpellForm(forms.ModelForm):
 class SpellEffectLinkForm(forms.ModelForm):
     class Meta:
         model = SpellEffectLink
-        fields = ['effect', 'note']
+        fields = ['effect']
         widgets = {
             'note': forms.Textarea(attrs={'rows': 6, 'style': 'resize: vertical'}),
         }

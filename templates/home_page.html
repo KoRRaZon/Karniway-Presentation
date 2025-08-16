@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/home_page.css' %}">
+{% endblock %}
+
+{% block content %}
+<section class="home">
+  <!-- Хедер страницы -->
+  <header class="home-hero">
+    <h1 class="home-title">Последние новости</h1>
+    <p class="home-subtitle">Свежие события проекта Karniway — всё в одном месте.</p>
+  </header>
+
+  <!-- Список новостей -->
+  {# Вью может передать 'news_list' (ListView) или 'news' — поддержим оба #}
+  {% with items=news_list|default:news %}
+    {% if items %}
+      <div class="news-list">
+        {% for n in items %}
+          <article class="news-card">
+            <h2 class="news-card__title">{{ n.title }}</h2>
+
+            {# Если у модели есть created_at (наследуется от IsDeletedModel у тебя), покажем #}
+            {% if n.created_at %}
+              <div class="news-card__meta">
+                <span class="dot"></span>
+                <time datetime="{{ n.created_at|date:'c' }}">{{ n.created_at|date:'d.m.Y H:i' }}</time>
+              </div>
+            {% endif %}
+
+            {# Полный текст. linebreaks -> переводит \n в <p>/<br>, сохраняя абзацы #}
+            <div class="news-card__text">
+              {{ n.text|linebreaks }}
+            </div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="home-empty">
+        <h3>Пока нет новостей</h3>
+        <p class="muted">Загляните позже — мы обязательно чем-то порадуем!</p>
+        <p>А пока что займитесь делом и бегом придумывать существ и заклинания :)</p>
+      </div>
+    {% endif %}
+  {% endwith %}
+</section>
+{% endblock %}

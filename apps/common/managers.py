@@ -26,13 +26,14 @@ class IsDeletedQuerySet(GetOrNoneQuerySet):
             self.update(is_deleted=True, deleted_at=timezone.now())
 
 
+
 class IsDeletedManager(models.Manager):
     def get_queryset(self):
         return IsDeletedQuerySet(self.model).filter(is_deleted=False)
 
     # отключает фильтрацию для вывода всех объектов модели
     def unfiltered(self):
-        return IsDeletedManager(self.model)
+        return IsDeletedQuerySet(self.model, using=self._db)
 
     def hard_delete(self):
         return self.unfiltered().delete(hard_delete=True)

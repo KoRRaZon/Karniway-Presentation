@@ -1,18 +1,73 @@
-{% extends 'base.html' %}
-
+{% extends "base.html" %}
 {% load static %}
 
 {% block extra_css %}
-
+<link rel="stylesheet" href="{% static 'css/post_form.css' %}">
 {% endblock %}
 
 {% block content %}
-<div>
-    <form method="post" action="{% url 'wiki:post_create' %}">
-        {% csrf_token %}
-        {{ form.as_p }}
-    </form>
+<div class="page">
+  <h1 class="title">Новая статья</h1>
+
+  <form method="post" enctype="multipart/form-data" novalidate class="post-form">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+      <div class="card error-card">
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
+
+    <div class="form-grid">
+      {# Левая колонка — «Основное» #}
+      <section class="card">
+        <h3>Основное</h3>
+
+        {# Title #}
+        {% if form.title %}
+          <div class="field">
+            {{ form.title.errors }}
+            <label>Заголовок {{ form.title }}</label>
+            {% if form.title.help_text %}
+              <div class="help">{{ form.title.help_text|safe }}</div>
+            {% endif %}
+          </div>
+        {% endif %}
+
+        {# Text #}
+        {% if form.text %}
+          <div class="field">
+            {{ form.text.errors }}
+            <label>Текст {{ form.text }}</label>
+            {% if form.text.help_text %}
+              <div class="help">{{ form.text.help_text|safe }}</div>
+            {% endif %}
+          </div>
+        {% endif %}
+      </section>
+
+      {# Правая колонка — «Дополнительно»: всё остальное, кроме title/text #}
+      <aside class="card">
+        <h3>Дополнительно</h3>
+
+        {% for field in form.visible_fields %}
+          {% if field.name != 'title' and field.name != 'text' %}
+            <div class="field">
+              {{ field.errors }}
+              <label>{{ field.label }} {{ field }}</label>
+              {% if field.help_text %}
+                <div class="help">{{ field.help_text|safe }}</div>
+              {% endif %}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </aside>
+    </div>
+
+    <div class="btns">
+      <button class="btn primary" type="submit">Сохранить</button>
+      <a class="btn" href="{% url 'wiki:post_list' %}">Отмена</a>
+    </div>
+  </form>
 </div>
-
-
 {% endblock %}
