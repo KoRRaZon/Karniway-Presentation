@@ -1,12 +1,21 @@
 from django.db import transaction
 from django.shortcuts import render
 from django.urls import reverse_lazy, reverse
-from django.views.generic import ListView, DetailView, UpdateView, CreateView
+from django.views.generic import ListView, DetailView, UpdateView, CreateView, DeleteView
 
-from apps.wiki.forms import PostEditForm, PostCreateForm, CreatureForm, CreatureAttackFormSet, \
-    CreaturePassiveFormSet, SpellEffectFormSet, SpellForm
-from apps.wiki.models import Post, Creature, Spell, SpellEffectLink
+from apps.wiki.forms import CreatureForm, CreatureAttackFormSet, \
+    CreaturePassiveFormSet, SpellEffectFormSet, SpellForm, PostForm
+from apps.wiki.models import Post, Creature, Spell, SpellEffectLink, News
 
+
+class NewsListView(ListView):
+    model = News
+    context_object_name = 'news'
+    template_name = 'home_page.html'
+    extra_context = {'title': 'Главная страница'}
+
+
+# POST: List, Detail, Create, Edit views
 
 class PostListView(ListView):
     model = Post
@@ -31,7 +40,7 @@ class PostDetailView(DetailView):
 
 class PostCreateView(CreateView):
     model = Post
-    form_class = PostCreateForm
+    form_class = PostForm
     template_name = 'wiki/post_create.html'
     context_object_name = 'post'
     extra_context = {'title': 'Создание статьи'}
@@ -44,9 +53,9 @@ class PostCreateView(CreateView):
 
 class PostEditView(UpdateView):
     model = Post
-    form_class = PostEditForm
+    form_class = PostForm
     context_object_name = 'post'
-    template_name = 'wiki/post_edit.html'
+    template_name = 'wiki/post_create.html'
     extra_context = {'title': 'Редактирование статьи'}
 
     def get_object(self, **kwargs):
@@ -56,7 +65,12 @@ class PostEditView(UpdateView):
         return reverse_lazy('wiki:post_detail', kwargs={'slug': self.object.slug})
 
 
-
+class PostDeleteView(DeleteView):
+    model = Post
+    context_object_name = 'post'
+    template_name = 'wiki/post_delete.html'
+    extra_context = {'title': 'Удаление статьи'}
+    success_url = reverse_lazy('wiki:post_list')
 
 
 # Существа. Просмотр списком/детально, создание, редактирование и удаление.
@@ -105,7 +119,7 @@ class CreatureCreateView(CreateView):
         attack_formset = context['attack_formset']
         passive_formset = context['passive_formset']
 
-        if not attack_formset.is_valid() or passive_formset.is_valid():
+        if not attack_formset.is_valid() or not passive_formset.is_valid():
             return self.form_invalid(form)
 
         with transaction.atomic():
@@ -137,7 +151,7 @@ class CreatureUpdateView(UpdateView):
             context['passive-formset'] = CreaturePassiveFormSet(self.request.POST, instance=creature, prefix="passive")
         else:
             context['attack_formset'] = CreatureAttackFormSet(instance=creature, prefix="attack")
-            context['passive-formset'] = CreaturePassiveFormSet(instance=creature, prefix="passive")
+            context['passive_formset'] = CreaturePassiveFormSet(instance=creature, prefix="passive")
 
         return context
 
@@ -146,7 +160,7 @@ class CreatureUpdateView(UpdateView):
         attack_formset = context['attack_formset']
         passive_formset = context['passive_formset']
 
-        if not attack_formset.is_valid() or passive_formset.is_valid():
+        if not attack_formset.is_valid() or not passive_formset.is_valid():
             return self.form_invalid(form)
 
         with transaction.atomic():
@@ -158,6 +172,12 @@ class CreatureUpdateView(UpdateView):
 
         return super().form_valid(form)
 
+
+class CreatureDeleteView(DeleteView):
+    model = Creature
+    template_name = 'wiki/creature_delete.html'
+    context_object_name = 'creature'
+    success_url = reverse_lazy('wiki:creature_list')
 
 
 # ЗАКЛИНАНИЯ
@@ -254,7 +274,12 @@ class SpellUpdateView(UpdateView):
         return super().form_valid(form)
 
 
-
+class SpellDeleteView(DeleteView):
+    model = Spell
+    template_name = 'wiki/spell_delete.html'
+    context_object_name = 'spell'
+    extra_context = {'title': 'Удаление заклинания'}
+    success_url = reverse_lazy('wiki:spell_list')
 
 
 

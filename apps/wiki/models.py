@@ -10,17 +10,51 @@ from apps.common.utils import unique_slugify
 
 class PostCategory(models.Model):
     name = models.CharField(max_length=50)
+    slug = models.SlugField(unique=True, null=False, blank=False)
+
+    class Meta:
+        ordering = ['name',]
+        verbose_name = "Категория постов"
+        verbose_name_plural = "Категории постов"
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        self.slug = unique_slugify(self, self.name)
+        super().save(*args, **kwargs)
+
 
 class Post(IsDeletedModel):
     title = models.CharField(max_length=100)
     slug = models.SlugField(max_length=100, unique=True, null=True, blank=True)
-    text = models.TextField()
+    category = models.ForeignKey(PostCategory, on_delete=models.CASCADE, null=True, blank=True)
+    text = models.TextField('Текст статьи', max_length=1500)
     image = models.ImageField(upload_to='post_images/', null=True, blank=True)
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    rating = models.FloatField(default=0, editable=False)
 
     class Meta:
-        ordering = ('-title',)
+        ordering = ('title',)
+        verbose_name = "Статья"
+        verbose_name_plural = "Статьи"
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        self.slug = unique_slugify(self, self.title, self.slug)
+        super().save(*args, **kwargs)
+
+
+class News(IsDeletedModel):
+    title = models.CharField('Название', max_length=100)
+    slug = models.SlugField('URL', max_length=100, unique=True, null=True, blank=True)
+    text = models.TextField('Текст', max_length=1500)
+
+    class Meta:
+        ordering = ('title',)
+        verbose_name = "Новость"
+        verbose_name_plural = "Новости"
 
     def __str__(self):
         return self.title
@@ -128,6 +162,11 @@ class SpellCategory(models.Model):
     name = models.CharField(max_length=50)
     slug = models.SlugField(max_length=60, unique=True, null=True, blank=True)
     image = models.ImageField(upload_to='wiki/spell_category_images/', null=True, blank=True)
+
+    class Meta:
+        ordering = ('name',)
+        verbose_name = 'Категория заклинаний'
+        verbose_name_plural = 'Категории заклинаний'
 
     def __str__(self):
         return self.name

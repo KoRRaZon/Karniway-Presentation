@@ -22,12 +22,10 @@
 
                 <h2>{{ creature.name }}</h2>
 
-            <p><strong>Категория:</strong>
-                <a href="/">{{ creature.category }}</a></p>
+            <p><strong>Категория: {{ creature.category }}</strong></p>
             <p class="dangerous-level"><strong>Опасность: </strong>{{ creature.dangerous_level }}</p>
             <p>{{ creature.description }}</p>
         </a>
-
     </div>
     {% empty %}
         <p>Нет существ в бестиарии.</p>

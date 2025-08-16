@@ -7,18 +7,68 @@ from django.forms import Textarea
 from django.utils.safestring import mark_safe
 
 from apps.wiki.models import Post, Creature, CreatureAttack, CreaturePassive, CreatureCategory, Spell, SpellEffect, \
-    SpellCategory, SpellEffectLink
+    SpellCategory, SpellEffectLink, PostCategory, News
 
+
+@admin.register(PostCategory)
+class PostCategoryForm(admin.ModelAdmin):
+    list_display = ("name", "slug")
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('title', 'author', 'text', 'created_at')
+    search_fields = ('title', 'text')
+    list_filter = ('author', 'is_deleted')
+
+    fieldsets = (
+        ('Основное', {
+            'fields': (('title', 'slug'), 'author', 'image')
+        }),
+        ('Текст статьи', {
+            'fields': ('text',)
+        }),
+        ('Дополнительно', {
+            'classes': ('collapse',),
+            'fields': ('created_at', 'updated_at', 'is_deleted', 'deleted_at')
+        })
+    )
 
 
+    readonly_fields = ('created_at', 'updated_at', 'is_deleted', 'deleted_at')
+
+    def get_queryset(self, request):
+        return self.model.objects.unfiltered().select_related("category")
+
+
+
+@admin.register(News)
+class NewsAdmin(admin.ModelAdmin):
+    list_display = ('title', 'slug', 'created_at')
+    search_fields = ('title', 'text')
+    readonly_fields = ('created_at', 'updated_at', 'is_deleted', 'deleted_at')
+
+    fieldsets = (
+        ('Основное', {
+            'fields': (('title', 'slug'),)
+        }),
+        ('Текст статьи', {
+            'fields': ('text',)
+        }),
+        ('Дополнительно', {
+            'classes': ('collapse',),
+            'fields': ('created_at', 'updated_at', 'is_deleted', 'deleted_at')
+        })
+    )
+
+    def get_queryset(self, request):
+        return self.model.objects.unfiltered()
+
+
+
+# CREATURE
 @admin.register(CreatureCategory)
 class CreatureCategoryAdmin(admin.ModelAdmin):
     search_fields = ("name",)
-
 
 # Виджет для компактности записи
 CompactTextarea = lambda rows=2: forms.Textarea(attrs={'rows': rows, 'style': 'width:100%'})
@@ -50,11 +100,9 @@ class CreaturePassiveInline(admin.StackedInline):
 
 @admin.register(Creature)
 class CreatureAdmin(admin.ModelAdmin):
-
     # Отображение колонок в списке существ
     list_display = (
-        "preview_image", "name", "image", "category", "dangerous_level", "armor_class",
-        "health", "size", "attacks_counter", "passives_counter",
+        "preview_image", "name", "image", "category", "dangerous_level", "attacks_counter", "passives_counter", "is_deleted"
     )
     list_select_related = ("category",) # предотвращение N+1 по CreatureCategory
     search_fields = ("name", "description",)
@@ -94,13 +142,12 @@ class CreatureAdmin(admin.ModelAdmin):
         return "-"
     preview_image.short_description = "Превью"
 
-    # Кверисет для подсчёта связанных объектов без доп. запроса
+    # Кверисет для подсчёта связанных объектов без доп. запроса, а также отображения всех объектов, даже is_deleted=True
     def get_queryset(self, request):
-        queryset = super().get_queryset(request)
-        return queryset.select_related("category").annotate(
+        return (self.model.objects.unfiltered().annotate(
             _attacks_count=Count("attacks"),
             _passives_count=Count("passives"),
-        )
+        ))
 
     @admin.display(description="Атак")
     def attacks_counter(self, obj):
@@ -115,14 +162,14 @@ class CreatureAdmin(admin.ModelAdmin):
 
 @admin.register(CreatureAttack)
 class CreatureAttackAdmin(admin.ModelAdmin):
-    list_display = ("name", "creature")
+    list_display = ("name", "creature", "text")
     list_select_related = ("creature",)
     search_fields = ("name", "text", "creature__name")
     autocomplete_fields = ("creature",)
 
 @admin.register(CreaturePassive)
 class CreaturePassiveAdmin(admin.ModelAdmin):
-    list_display = ("name", "creature")
+    list_display = ("name", "creature", "text")
     list_select_related = ("creature",)
     search_fields = ("name", "text", "creature__name")
     autocomplete_fields = ("creature",)
@@ -165,6 +212,9 @@ class SpellAdmin(admin.ModelAdmin):
     )
 
     inlines = [SpellEffectInline]
+
+    def get_queryset(self, request):
+        return self.model.objects.unfiltered().select_related("category")
 
     def preview_image(self, obj):
         if obj.image:
