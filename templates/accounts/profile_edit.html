@@ -1,10 +1,103 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% load static %}
 
-</body>
-</html>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/accounts/profile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="profile-page">
+  <section class="profile-card">
+    <div class="profile-header">
+      <div class="profile-avatar-wrap">
+        {% if request.user.account_type == 'player' and request.user.player and request.user.player.avatar %}
+          <img class="profile-avatar" src="{{ request.user.player.avatar.url }}" alt="Аватар">
+        {% elif request.user.account_type == 'master' and request.user.master and request.user.master.avatar %}
+          <img class="profile-avatar" src="{{ request.user.master.avatar.url }}" alt="Аватар">
+        {% else %}
+          <img class="profile-avatar" src="{% static 'img/avatar_default.svg' %}" alt="Аватар">
+        {% endif %}
+      </div>
+
+      <div class="profile-title">
+        <h1 class="profile-name">Редактирование профиля</h1>
+        <div class="profile-sub">
+          <span class="role-badge">
+            {% if request.user.account_type == 'player' %}Игрок{% else %}Мастер{% endif %}
+          </span>
+        </div>
+      </div>
+
+      <div class="profile-actions">
+        <a class="btn" href="{% url 'accounts:profile' %}">Отмена</a>
+      </div>
+    </div>
+
+    <div class="profile-body">
+      <form method="post" enctype="multipart/form-data" class="profile-form">
+        {% csrf_token %}
+        {% if user_form.non_field_errors %}
+          <div class="form-errors">{{ user_form.non_field_errors }}</div>
+        {% endif %}
+        {% if role_form.non_field_errors %}
+          <div class="form-errors">{{ role_form.non_field_errors }}</div>
+        {% endif %}
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="{{ user_form.first_name.id_for_label }}">Имя</label>
+            {{ user_form.first_name }}
+            {{ user_form.first_name.errors }}
+          </div>
+          <div class="form-group">
+            <label for="{{ user_form.last_name.id_for_label }}">Фамилия</label>
+            {{ user_form.last_name }}
+            {{ user_form.last_name.errors }}
+          </div>
+          <div class="form-group span-2">
+            <label for="{{ user_form.avatar.id_for_label }}">Аватар</label>
+            {{ user_form.avatar }}
+            {{ user_form.avatar.errors }}
+          </div>
+
+          {% if request.user.account_type == 'player' %}
+            <div class="form-group">
+              <label for="{{ role_form.nickname.id_for_label }}">Псевдоним</label>
+              {{ role_form.nickname }}
+              {{ role_form.nickname.errors }}
+            </div>
+            <div class="form-group span-2">
+              <label for="{{ role_form.description.id_for_label }}">О себе</label>
+              {{ role_form.description }}
+              {{ role_form.description.errors }}
+            </div>
+          {% else %}
+            <div class="form-group">
+              <label for="{{ role_form.nickname.id_for_label }}">Псевдоним</label>
+              {{ role_form.nickname }}
+              {{ role_form.nickname.errors }}
+            </div>
+            <div class="form-group span-2">
+              <label for="{{ role_form.description.id_for_label }}">О себе</label>
+              {{ role_form.description }}
+              {{ role_form.description.errors }}
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Сохранить</button>
+          <a href="{% url 'accounts:profile' %}" class="btn">Отмена</a>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <section class="profile-sections">
+    <div class="card">
+      <h3 class="section-title">Предпросмотр</h3>
+      <p class="muted">После сохранения изменения появятся в профиле.</p>
+    </div>
+  </section>
+</div>
+{% endblock %}

@@ -11,8 +11,8 @@
 
         {% if user.is_authenticated %}
         <nav class="login-nav">
-            <a href="#">Профиль</a>
-            <a href="#">Выйти</a>
+            <a href="{% url 'accounts:profile' %}">Профиль</a>
+            <a href="{% url 'accounts:logout' %}">Выйти</a>
         </nav>
         {% else %}
         <nav class="login-nav">
