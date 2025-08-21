@@ -8,7 +8,7 @@ app_name = 'wiki'
 
 
 urlpatterns = [
-    path('', NewsListView.as_view(), name='news_list'),
+    path('', NewsListView.as_view(), name='home_page'),
 
     path('posts/', PostListView.as_view(), name='post_list'),
     path('posts/create/', PostCreateView.as_view(), name='post_create'),

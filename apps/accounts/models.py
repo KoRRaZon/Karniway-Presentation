@@ -38,10 +38,13 @@ class CustomUser(AbstractBaseUser, IsDeletedModel, PermissionsMixin):
 
 class Player(IsDeletedModel):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    nickname = models.CharField('Псевдоним игрока', max_length=20)
+    avatar = models.ImageField(upload_to='accounts/avatars/', null=True, blank=True)
+    nickname = models.CharField('Псевдоним игрока', max_length=30)
     description = models.TextField('Расскажите о себе', max_length=500)
 
 
 class Master(IsDeletedModel):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    avatar = models.ImageField(upload_to='accounts/avatars/', null=True, blank=True)
+    nickname = models.CharField('Псевдоним мастера', max_length=30)
     description = models.TextField('Расскажите о себе', max_length=500)

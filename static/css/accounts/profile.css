@@ -1,0 +1,199 @@
+/* Страница профиля */
+.profile-page {
+  display: grid;
+  gap: 20px;
+}
+
+/* Карточка профиля */
+.profile-card {
+  background: var(--card-bg, #121212);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+  overflow: hidden;
+}
+
+.profile-header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), transparent 70%);
+}
+
+.profile-avatar-wrap {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid rgba(255,255,255,0.12);
+}
+
+.profile-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-title {
+  min-width: 0;
+}
+
+.profile-name {
+  margin: 0 0 4px;
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.profile-sub {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  color: rgba(255,255,255,0.75);
+  font-size: 14px;
+}
+
+.role-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+.nickname { opacity: .9; }
+
+.profile-actions .btn {
+  white-space: nowrap;
+}
+
+.profile-body {
+  padding: 20px;
+}
+
+.section-title {
+  margin: 0 0 12px;
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: .02em;
+}
+
+.profile-description {
+  margin: 0;
+  color: rgba(255,255,255,0.85);
+}
+
+/* Нижние секции */
+.profile-sections {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr;
+}
+
+.card {
+  background: var(--card-bg, #121212);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 16px;
+  padding: 16px 20px;
+}
+
+.muted { color: rgba(255,255,255,0.6); }
+
+/* Кнопки */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.04);
+  color: #fff;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform .06s ease, background .2s ease, border-color .2s ease;
+}
+
+.btn:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.22); }
+.btn:active { transform: translateY(1px); }
+
+.btn-primary {
+  background: #2f6fed;
+  border-color: #2f6fed;
+}
+.btn-primary:hover { background: #3c79f0; border-color: #3c79f0; }
+
+/* Форма */
+.profile-form { margin-top: 6px; }
+
+.form-errors {
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(255,0,0,.07);
+  border: 1px solid rgba(255,0,0,.25);
+  color: #ffb0b0;
+  font-size: 14px;
+}
+
+.form-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: rgba(255,255,255,.8);
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="file"],
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.04);
+  color: #fff;
+  outline: none;
+}
+
+.form-group textarea { min-height: 120px; resize: vertical; }
+
+.form-group .helptext,
+.form-group .errorlist {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: rgba(255,255,255,.7);
+}
+
+.form-group .errorlist { color: #ffb0b0; }
+
+.form-group.span-2 { grid-column: span 2; }
+
+.form-actions {
+  margin-top: 8px;
+  display: flex;
+  gap: 10px;
+}
+
+/* Адаптив */
+@media (max-width: 800px) {
+  .profile-header {
+    grid-template-columns: auto 1fr;
+    grid-auto-rows: auto;
+  }
+  .profile-actions { grid-column: 1 / -1; }
+  .form-grid { grid-template-columns: 1fr; }
+  .form-group.span-2 { grid-column: span 1; }
+}
