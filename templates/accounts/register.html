@@ -1,11 +1,72 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/accounts/auth.css' %}">
+{% endblock %}
 
 {% block content %}
+<div class="auth-wrap">
+  <div class="auth-card">
     <h1>{{ title }}</h1>
-    <form method="post" action="{% url 'accounts:register' %}">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Зарегистрироваться</button>
-    </form>
 
+    {# вывод ошибок формы (например, email уже занят) #}
+    {% if form.non_field_errors %}
+      <div class="form-errors">
+        {% for err in form.non_field_errors %}<p>{{ err }}</p>{% endfor %}
+      </div>
+    {% endif %}
+
+    <form method="post" action="{% url 'accounts:register' %}">
+      {% csrf_token %}
+
+      <div class="field">
+        <label for="{{ form.first_name.id_for_label }}">Имя</label>
+        {{ form.first_name }}
+        {% if form.first_name.errors %}
+          <div class="field-error">{{ form.first_name.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.last_name.id_for_label }}">Фамилия</label>
+        {{ form.last_name }}
+        {% if form.last_name.errors %}
+          <div class="field-error">{{ form.last_name.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.email.id_for_label }}">Email</label>
+        {{ form.email }}
+        {% if form.email.errors %}
+          <div class="field-error">{{ form.email.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.password.id_for_label }}">Пароль</label>
+        {{ form.password }}
+        {% if form.password.errors %}
+          <div class="field-error">{{ form.password.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.account_type.id_for_label }}">Тип аккаунта</label>
+        {{ form.account_type }}
+        {% if form.account_type.errors %}
+          <div class="field-error">{{ form.account_type.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="btn-primary">Зарегистрироваться</button>
+        <div class="links">
+          <a href="{% url 'accounts:login' %}">Уже есть аккаунт?</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
 {% endblock %}

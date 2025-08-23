@@ -18,7 +18,7 @@ class CustomUserAdmin(BaseUserAdmin):
         (None, {'fields': ('email', 'password')}),
         ('Персональная информация', {'fields': ('first_name', 'last_name')}),
         ('Разрешения', {'fields': ('is_active', 'is_staff', 'is_superuser', 'account_type')}),
-        ('Важные даты', {'fields': ('created_at', 'last_login')}),
+        ('Важные даты', {'fields': (('created_at', 'is_deleted', 'deleted_at'), 'last_login')}),
     )
 
     add_fieldsets = (
@@ -29,6 +29,9 @@ class CustomUserAdmin(BaseUserAdmin):
     )
 
     search_fields = ('email', 'first_name', 'last_name', 'account_type')
+
+    def delete_model(self, request, obj):
+        obj.hard_delete()
 
 
 @admin.register(Player)

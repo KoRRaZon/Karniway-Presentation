@@ -1,10 +1,57 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% load static %}
 
-</body>
-</html>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/accounts/auth.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="auth-wrap">
+  <div class="auth-card">
+    <h1>Вход</h1>
+
+    {# общие ошибки формы (например, «Неверный логин или пароль») #}
+    {% if form.non_field_errors %}
+      <div class="form-errors">
+        {% for err in form.non_field_errors %}<p>{{ err }}</p>{% endfor %}
+      </div>
+    {% endif %}
+
+    <form method="post" action="{% url 'accounts:login' %}">
+      {% csrf_token %}
+
+      <div class="field">
+        <label for="{{ form.username.id_for_label }}">Email или логин</label>
+        {{ form.username }}
+        {% if form.username.errors %}
+          <div class="field-error">{{ form.username.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.password.id_for_label }}">Пароль</label>
+        {{ form.password }}
+        {% if form.password.errors %}
+          <div class="field-error">{{ form.password.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+      {# если захочешь «Запомнить меня», сделаем отдельной задачей (нужно обработать в LoginView) #}
+      <!--
+      <div class="field checkbox">
+        <label><input type="checkbox" name="remember_me"> Запомнить меня</label>
+      </div>
+      -->
+
+      <div class="actions">
+        <button type="submit" class="btn-primary">Войти</button>
+        <div class="links">
+          <a href="{% url 'accounts:register' %}">Регистрация</a>
+          <span class="sep">·</span>
+          <a href="#">Забыли пароль?</a> {# позже подменишь на {% url 'password_reset' %} если добавишь маршруты #}
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

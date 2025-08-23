@@ -12,12 +12,16 @@
         {% if user.is_authenticated %}
         <nav class="login-nav">
             <a href="{% url 'accounts:profile' %}">Профиль</a>
-            <a href="{% url 'accounts:logout' %}">Выйти</a>
+            <form method="post" action="{% url 'accounts:logout' %}">
+                {% csrf_token %}
+                <button type="submit">Выйти</button>
+            </form>
         </nav>
+
         {% else %}
         <nav class="login-nav">
-            <a href="#">Войти</a>
-            <a href="#">Регистрация</a>
+            <a href="{% url 'accounts:login' %}">Войти</a>
+            <a href="{% url 'accounts:register' %}">Регистрация</a>
         </nav>
         {% endif %}
     </div>

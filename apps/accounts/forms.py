@@ -25,10 +25,17 @@ class UserRegisterForm(forms.ModelForm):
     email = forms.EmailField()
     password = forms.CharField(widget=forms.PasswordInput)
     password_confirm = forms.CharField(widget=forms.PasswordInput)
+    account_type = forms.ChoiceField(
+        label='Тип аккаунта',
+        choices=(
+            ('player', 'Игрок'),
+            ('master', 'Мастер'),),
+        widget=forms.RadioSelect, # forms.Select, для выпадающего списка
+    )
 
     class Meta:
         model = CustomUser
-        fields = ('email', 'first_name', 'last_name', 'password', 'password_confirm')
+        fields = ('email', 'first_name', 'last_name', 'password', 'password_confirm', 'account_type')
 
     def clean(self):
         cleaned_data = super().clean()
@@ -37,6 +44,18 @@ class UserRegisterForm(forms.ModelForm):
         if password and password_confirm and password != password_confirm:
             raise forms.ValidationError("Пароли не совпадают")
         return cleaned_data
+
+    def save(self, commit=True):
+        """
+        - переносим выбранный account_type в модель;
+        - НЕ хэшируем пароль (это делает view через user.set_password()).
+        """
+        user = super().save(commit=False)
+        user.account_type = self.cleaned_data['account_type']
+        if commit:
+            user.save()
+        return user
+
 
 class UserLoginForm(forms.ModelForm):
     email = forms.EmailField()
