@@ -1,0 +1,131 @@
+/* ============ AUTH LAYOUT ============ */
+
+.auth-wrap{
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+}
+
+.auth-card{
+  width:100%;
+  max-width:480px;
+  margin:40px auto 0;
+  padding:28px;
+  background:#2b2b2b;
+  border:1px solid #3a3a3a;
+  border-radius:14px;
+  box-shadow: 0 6px 24px rgba(0,0,0,.35);
+}
+
+.auth-card h1{
+  margin:0 0 18px;
+  font-size:28px;
+  color:#fff;
+}
+
+/* ошибки */
+.form-errors{
+  background:#3a2020;
+  border:1px solid #a44;
+  color:#ffdede;
+  padding:12px 14px;
+  border-radius:10px;
+  margin-bottom:14px;
+  font-size:14px;
+}
+
+/* поля */
+.field{
+  margin-bottom:14px;
+}
+
+.field label{
+  display:block;
+  margin-bottom:6px;
+  color:#ddd;
+  font-size:14px;
+}
+
+.auth-card input[type="text"],
+.auth-card input[type="email"],
+.auth-card input[type="password"]{
+  width:100%;
+  padding:10px 12px;
+  border:1px solid #444;
+  background:#1f1f1f;
+  color:#f0f0f0;
+  border-radius:10px;
+  outline:none;
+  transition:border-color .15s ease, box-shadow .15s ease;
+}
+
+.auth-card input[type="text"]:focus,
+.auth-card input[type="email"]:focus,
+.auth-card input[type="password"]:focus{
+  border-color:#6a6a6a;
+  box-shadow:0 0 0 3px rgba(255,255,255,.06);
+}
+
+.field-error{
+  margin-top:6px;
+  color:#ffb3b3;
+  font-size:12px;
+}
+
+/* действия */
+.actions{
+  margin-top:18px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+/* кнопка в стиле проекта */
+.btn-primary{
+  appearance:none;
+  border:1px solid #666;
+  background:#1e1e1e;
+  color:#eaeaea;
+  padding:10px 16px;
+  border-radius:10px;
+  cursor:pointer;
+  transition:background .15s ease, color .15s ease, border-color .15s ease;
+}
+
+.btn-primary:hover{
+  background:#262626;
+  color:#fff;
+  border-color:#888;
+}
+
+/* ссылки справа */
+.actions .links{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.actions .links a{
+  color:#d0d0d0;
+  text-decoration:none;
+}
+
+.actions .links a:hover{
+  color:#fff;
+}
+
+.actions .links .sep{
+  color:#666;
+}
+
+/* компакт на узких экранах */
+@media (max-width: 560px){
+  .actions{
+    flex-direction:column;
+    gap:12px;
+    align-items:stretch;
+  }
+  .actions .links{
+    justify-content:center;
+  }
+}

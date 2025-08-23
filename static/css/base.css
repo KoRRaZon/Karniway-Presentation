@@ -25,6 +25,13 @@ h1, h2, h3 {
     margin-top: 0;
 }
 
+/* Сообщения */
+.flash-stack{margin:16px 30px}
+.flash{padding:10px 12px;border-radius:8px;margin-bottom:8px;border:1px solid #444;background:#2b2b2b;color:#eee}
+.flash.success{border-color:#2f6; background:#17341c}
+.flash.error{border-color:#f66; background:#3a2020}
+.flash.warning{border-color:#fc6; background:#3a2f12}
+
 
 /* ============================= */
 /*            HEADER            */
@@ -56,6 +63,29 @@ header {
     padding-left: 20px;
     border-left: 1px solid #555;
 }
+
+.login-nav form {
+    display: inline;  /* форма не ломает строчку */
+    margin: 0;
+    padding: 0;
+}
+
+.login-nav form button {
+    background: none;
+    border: none;
+    color: #d0d0d0;          /* как у ссылок */
+    cursor: pointer;
+    font: inherit;
+    padding: 0;
+    line-height: 2;
+    text-decoration: none;
+}
+
+.login-nav form button:hover {
+    color: #ffffff;          /* как у ссылок при hover */
+}
+
+
 .authenticate-nav nav a {
     line-height: 2;
 }

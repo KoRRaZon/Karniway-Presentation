@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/accounts/profile.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="profile-page">
+  <section class="profile-card">
+    <div class="profile-header">
+      <div class="profile-avatar-wrap">
+        {% if user_obj.account_type == 'player' and user_obj.player and user_obj.player.avatar %}
+          <img class="profile-avatar" src="{{ user_obj.player.avatar.url }}" alt="Аватар">
+        {% elif user_obj.account_type == 'master' and user_obj.master and user_obj.master.avatar %}
+          <img class="profile-avatar" src="{{ user_obj.master.avatar.url }}" alt="Аватар">
+        {% else %}
+          <img class="profile-avatar" src="{% static 'img/avatar_default.svg' %}" alt="Аватар">
+        {% endif %}
+      </div>
+
+      <div class="profile-title">
+        <h1 class="profile-name">{{ user_obj.first_name }} {{ user_obj.last_name }}</h1>
+        <div class="profile-sub">
+          <span class="role-badge">
+            {% if user_obj.account_type == 'player' %}Игрок{% else %}Мастер{% endif %}
+          </span>
+          {% if user_obj.account_type == 'player' and user_obj.player %}
+            <span class="nickname">@{{ user_obj.player.nickname }}</span>
+          {% elif user_obj.account_type == 'master' and user_obj.master %}
+            <span class="nickname">@{{ user_obj.master.nickname }}</span>
+          {% endif %}
+        </div>
+      </div>
+
+      {% if request.user.pk == user_obj.pk %}
+        <div class="profile-actions">
+          <a class="btn btn-primary" href="{% url 'accounts:profile_edit' %}">Редактировать профиль</a>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="profile-body">
+      <h3 class="section-title">О себе</h3>
+      <p class="profile-description">
+        {% if user_obj.account_type == 'player' and user_obj.player %}
+          {{ user_obj.player.description|default:"Пока нет описания." }}
+        {% elif user_obj.account_type == 'master' and user_obj.master %}
+          {{ user_obj.master.description|default:"Пока нет описания." }}
+        {% else %}
+          Пока нет описания.
+        {% endif %}
+      </p>
+    </div>
+  </section>
+
+  <section class="profile-sections">
+    <div class="card">
+      <h3 class="section-title">Активность</h3>
+      <p class="muted">Здесь будет лента постов / кампаний / покупок и т.п.</p>
+    </div>
+    <div class="card">
+      <h3 class="section-title">Достижения</h3>
+      <p class="muted">Позже добавим бейджи и статистику.</p>
+    </div>
+  </section>
+</div>
+{% endblock %}

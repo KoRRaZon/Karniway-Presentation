@@ -13,7 +13,16 @@
     <div class="layout">
       {% include 'sidebar.html' %}
       <main class="main-container">
-        {% block content %}{% endblock %}
+        {% block content %}
+          {% if messages %}
+          <div class="flash-stack">
+            {% for message in messages %}
+                <div class="flash {{message.tags}}">{{ message }}</div>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+        {% endblock %}
       </main>
     </div>
 
