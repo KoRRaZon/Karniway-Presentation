@@ -13,6 +13,9 @@ class ProductCategory(models.Model):
         verbose_name = 'Категория товаров'
         verbose_name_plural = 'Категории товаров'
 
+    def __str__(self):
+        return self.name
+
     def save(self, *args, **kwargs):
         self.slug = unique_slugify(self, self.name, self.slug)
         super().save(*args, **kwargs)
@@ -50,7 +53,8 @@ class Product(IsDeletedModel):
         return self.name
 
     def save(self, *args, **kwargs):
-        self.slug = unique_slugify(self, self.name, self.slug)
+        if not self.slug:
+            self.slug = unique_slugify(self, self.name, self.slug)
         super().save(*args, **kwargs)
 
 
