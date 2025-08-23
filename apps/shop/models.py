@@ -41,9 +41,21 @@ class Product(IsDeletedModel):
     price = models.DecimalField('Цена', max_digits=10, decimal_places=2)
     prom_price = models.DecimalField('Акционная цена', max_digits=10, decimal_places=2, null=True, blank=True)
 
+    class Meta:
+        ordering = ('name',)
+        verbose_name = 'Товар'
+        verbose_name_plural = 'Товары'
+
+    def __str__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        self.slug = unique_slugify(self, self.name, self.slug)
+        super().save(*args, **kwargs)
+
 
 def product_image_upload_to(instance, filename):
-    return f'shop/products/{instance.slug}/{filename}'
+    return f'shop/products/{instance.product.slug}/{filename}'
 
 
 class ProductImage(models.Model):
