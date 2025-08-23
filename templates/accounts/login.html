@@ -48,7 +48,7 @@
         <div class="links">
           <a href="{% url 'accounts:register' %}">Регистрация</a>
           <span class="sep">·</span>
-          <a href="#">Забыли пароль?</a> {# позже подменишь на {% url 'password_reset' %} если добавишь маршруты #}
+          <a href="{% url 'accounts:password_reset' %}">Забыли пароль?</a>
         </div>
       </div>
     </form>

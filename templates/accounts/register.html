@@ -53,6 +53,14 @@
       </div>
 
       <div class="field">
+        <label for="{{ form.password.id_for_label }}">Подтверждение пароля</label>
+        {{ form.password_confirm }}
+        {% if form.password.errors %}
+          <div class="field-error">{{ form.password.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+      <div class="field">
         <label for="{{ form.account_type.id_for_label }}">Тип аккаунта</label>
         {{ form.account_type }}
         {% if form.account_type.errors %}

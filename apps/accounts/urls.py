@@ -2,7 +2,8 @@ from django.urls import path
 from django.views.generic import TemplateView
 
 from apps.accounts.views import UserRegisterView, UserLoginView, UserLogoutView, OwnProfileView, PublicProfileView, \
-    ProfileUpdateView, ActivateAccountView
+    ProfileUpdateView, ActivateAccountView, UserPasswordResetConfirmView, UserPasswordResetView, \
+    UserPasswordResetDoneView, UserPasswordResetCompleteView
 
 app_name = 'accounts'
 
@@ -22,4 +23,9 @@ urlpatterns = [
 
     path('login/', UserLoginView.as_view(), name='login'),
     path('logout/', UserLogoutView.as_view(), name='logout'),
+
+    path('password_reset/', UserPasswordResetView.as_view(), name='password_reset'),
+    path('password_reset/done/', UserPasswordResetDoneView.as_view(), name='password_reset_done'),
+    path('reset/<uidb64>/<token>/', UserPasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('reset/complete/', UserPasswordResetCompleteView.as_view(), name='password_reset_complete'),
 ]
