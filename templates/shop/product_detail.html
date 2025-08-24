@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/shop/product_detail.css' %}">
+{% endblock %}
+
+{% block content %}
+{% with p=object|default:product %}
+<h1>{{ p.name }}</h1>
+
+<div class="k-layout">
+  <section class="k-gallery">
+    <div class="k-preview" id="preview">
+      {% with imgs=p.images.all %}
+        {% if imgs and imgs.0.image %}
+          <img id="preview-img" src="{{ imgs.0.image.url }}" alt="{{ p.name }}">
+        {% else %}
+          <div class="k-noimg">Нет изображения</div>
+        {% endif %}
+      {% endwith %}
+    </div>
+
+    <div class="k-thumbs" id="thumbs">
+      {% for img in p.images.all %}
+        {% if img.image %}
+          <img class="k-thumb" src="{{ img.image.url }}" alt="" data-full="{{ img.image.url }}">
+        {% endif %}
+      {% endfor %}
+    </div>
+  </section>
+
+  <section class="k-info">
+    <div class="k-meta">
+      {% if p.category %}<span class="k-chip">{{ p.category.name }}</span>{% endif %}
+      {% for t in p.tags.all %}
+        <span class="k-chip k-chip--muted">{{ t.name }}</span>
+      {% endfor %}
+    </div>
+
+    <div class="k-price">
+      {% if p.prom_price %}
+        <div class="k-price-new">{{ p.prom_price }}</div>
+        <div class="k-price-old">{{ p.price }}</div>
+      {% else %}
+        <div class="k-price-new">{{ p.price }}</div>
+      {% endif %}
+    </div>
+
+    {% if p.quantity > 0 %}
+      <div class="k-stock k-stock--ok">В наличии: {{ p.quantity }}</div>
+    {% else %}
+      <div class="k-stock k-stock--out">Нет в наличии</div>
+    {% endif %}
+
+    <div class="k-actions">
+      {% if can_edit %}
+        <a class="k-btn" href="{% url 'shop:product_edit' p.slug %}">Редактировать</a>
+      {% endif %}
+      <a class="k-btn k-btn--ghost" href="{% url 'shop:product_list' %}">Назад в каталог</a>
+    </div>
+
+    {% if p.description %}
+      <div class="k-desc">
+        <h3>Описание</h3>
+        <p>{{ p.description|linebreaksbr }}</p>
+      </div>
+    {% endif %}
+  </section>
+</div>
+
+<script>
+  // простая замена превью по клику на миниатюру
+  (function(){
+    const thumbs = document.getElementById('thumbs');
+    const preview = document.getElementById('preview-img');
+    if (!thumbs || !preview) return;
+    thumbs.addEventListener('click', (e)=>{
+      if (e.target && e.target.matches('img.k-thumb')) {
+        const src = e.target.getAttribute('data-full') || e.target.src;
+        preview.src = src;
+      }
+    });
+  })();
+</script>
+{% endwith %}
+{% endblock %}

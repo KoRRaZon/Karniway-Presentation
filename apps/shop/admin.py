@@ -31,7 +31,7 @@ def media_url(path:str) -> str:
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('preview_image', 'name', 'slug', 'category', 'images_counter', 'quantity', 'price',)
+    list_display = ('preview_image', 'name', 'user', 'slug', 'category', 'images_counter', 'quantity', 'price',)
     list_filter = ('category',)
     search_fields = ('name', 'description', 'category__name',)
     autocomplete_fields = ('category',)
@@ -39,7 +39,7 @@ class ProductAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ('Основное', {
-            'fields': (('name', 'slug', 'category'), ('quantity', 'price', 'prom_price'))
+            'fields': (('name', 'slug', 'category', 'user'), ('quantity', 'price', 'prom_price'))
         }),
         ('Детально', {
             'fields': ('description',)

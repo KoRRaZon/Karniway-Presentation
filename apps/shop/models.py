@@ -1,4 +1,7 @@
+from django.conf import settings
 from django.db import models
+from django.db.models import Q
+from django.urls import reverse
 
 from apps.common.models import IsDeletedModel
 from apps.common.utils import unique_slugify
@@ -17,11 +20,12 @@ class ProductCategory(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        self.slug = unique_slugify(self, self.name, self.slug)
+        if not self.slug:
+            self.slug = unique_slugify(self, self.name, self.slug)
         super().save(*args, **kwargs)
 
 
-class ProductTags(models.Model):
+class ProductTag(models.Model):
     name = models.CharField('Тег', max_length=40)
     slug = models.SlugField('URL тега', max_length=50, unique=True, null=True, blank=True)
 
@@ -31,14 +35,17 @@ class ProductTags(models.Model):
         verbose_name_plural = 'Теги товаров'
 
     def save(self, *args, **kwargs):
-        self.slug = unique_slugify(self, self.name, self.slug)
+        if not self.slug:
+            self.slug = unique_slugify(self, self.name, self.slug)
         super().save(*args, **kwargs)
 
 
 class Product(IsDeletedModel):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
     name = models.CharField('Название товара', max_length=100)
     slug = models.SlugField('URL товара', max_length=100, unique=True, null=False, blank=False)
     category = models.ForeignKey(ProductCategory, on_delete=models.PROTECT, verbose_name='Категория товара')
+    tags = models.ManyToManyField(ProductTag, related_name='products', verbose_name='Теги', blank=True, null=True)
     description = models.TextField('Описание', max_length=600)
     quantity = models.PositiveIntegerField('Количество в наличии', default=1)
     price = models.DecimalField('Цена', max_digits=10, decimal_places=2)
@@ -48,9 +55,17 @@ class Product(IsDeletedModel):
         ordering = ('name',)
         verbose_name = 'Товар'
         verbose_name_plural = 'Товары'
+        constraints = [
+            models.CheckConstraint(check=Q(price__gte=0), name='product_price'),
+            models.CheckConstraint(check=Q(prom_price__gte=0), name='product_prom_price'),
+            models.CheckConstraint(check=Q(quantity__gt=0), name='product_quantity_non_negative'),
+        ]
 
     def __str__(self):
         return self.name
+
+    def get_absolute_url(self):
+        return reverse('shop:product_detail', kwargs={'slug': self.slug})
 
     def save(self, *args, **kwargs):
         if not self.slug:

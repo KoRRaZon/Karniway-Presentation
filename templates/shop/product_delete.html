@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/shop/product_delete.css' %}">
+{% endblock %}
+
+{% block content %}
+{% with p=object|default:product %}
+<section class="k-delete">
+  <div class="k-card">
+    <h1>Удалить товар?</h1>
+
+    <div class="k-warning">
+      Вы собираетесь удалить <strong>{{ p.name }}</strong>. Это действие необратимо.
+    </div>
+
+    <div class="k-preview">
+      {% with imgs=p.images.all %}
+        {% if imgs and imgs.0.image %}
+          <img src="{{ imgs.0.image.url }}" alt="{{ p.name }}">
+        {% else %}
+          <div class="k-noimg">Нет изображения</div>
+        {% endif %}
+      {% endwith %}
+    </div>
+
+    {% if form and form.non_field_errors %}
+      <div class="k-alert k-alert--error">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="k-actions">
+        <a href="{% url 'shop:product_detail' slug=p.slug %}" class="k-btn k-btn--ghost">Отмена</a>
+        <button type="submit" class="k-btn k-btn--danger">Удалить</button>
+      </div>
+    </form>
+  </div>
+</section>
+{% endwith %}
+{% endblock %}
