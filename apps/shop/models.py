@@ -1,3 +1,5 @@
+from decimal import Decimal, ROUND_HALF_UP
+
 from django.conf import settings
 from django.db import models
 from django.db.models import Q
@@ -103,8 +105,81 @@ class ProductImage(models.Model):
         return f"{self.product}'s image {self.position}"
 
 
+class ProductVote(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='votes')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
+    value = models.SmallIntegerField(choices=[(1, 'up'), (-1, 'down')])
+
+    class Meta:
+        ordering = ('pk',)
+        verbose_name = 'Оценки товаров'
+        verbose_name_plural = 'Оценки товаров'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['product', 'user'],
+                name='unique_user_vote_for_product'
+            )
+        ]
 
 
+class ProductRating(models.Model):
+    product = models.OneToOneField(Product, on_delete=models.CASCADE, related_name='rating')
+    up_count = models.PositiveIntegerField('Позитивные голоса', default=0)
+    down_count = models.PositiveIntegerField('Негативные голоса', default=0)
+    rating = models.DecimalField('Рейтинг (1.0-5.0)', max_digits=2, decimal_places=1, default=Decimal('1.0'))
+    class Meta:
+        ordering = ('rating',)
+        verbose_name = 'Рейтинг товаров'
+        verbose_name_plural = 'Рейтинги товаров'
+
+    def __str__(self):
+        return f"{self.product}'s rating: {self.rating}"
+
+    def recompute(self, save=True):
+        total = self.up_count + self.down_count
+        if total == 0:
+            stars = Decimal('0.0')
+        else:
+            p = Decimal(self.up_count) / Decimal(total)
+            stars = Decimal('1.0') + Decimal('4.0') * p
+
+        # Округление до одной цифры после запятой по "обычным" правилам
+        stars = stars.quantize(Decimal('0.1'), rounding=ROUND_HALF_UP)
+
+        # гарантирует диапазон 1.0 - 5.0
+        if stars < Decimal('1.0'):
+            stars = Decimal('1.0')
+        elif stars > Decimal('5.0'):
+            stars = Decimal('5.0')
+
+        self.rating = stars
+        if save:
+            self.save(update_fields=['rating'])
+        return self
+
+
+class ProductReview(IsDeletedModel):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='product_reviews')
+    text = models.TextField('Отзыв', max_length=800)
+
+    class Meta:
+        ordering = ('-created_at',)
+        verbose_name = 'Отзыв на товар'
+        verbose_name_plural = 'Отзывы на товары'
+        indexes = [
+            models.Index(fields=['product', '-created_at']),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=['product', 'user'],
+                name='unique_user_review_per_product',
+            )
+        ]
+
+    def __str__(self):
+        user = self.user and getattr(self.user, 'full_name', None) or 'Гость'
+        return f"Отзыв {user} для {self.product}"
 
 
 

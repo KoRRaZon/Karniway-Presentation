@@ -53,6 +53,11 @@
       <div class="k-stock k-stock--out">Нет в наличии</div>
     {% endif %}
 
+
+    {# РЕЙТИНГ (фрагмент рендерится сразу; после кликов HTMX будет заменять этот div на новую версию) #}
+    {% include "shop/partials/_rating.html" with p=p user_vote_value=user_vote_value %}
+
+
     <div class="k-actions">
       {% if can_edit %}
         <a class="k-btn" href="{% url 'shop:product_edit' p.slug %}">Редактировать</a>
@@ -69,6 +74,34 @@
   </section>
 </div>
 
+
+{# === REVIEWS BLOCK: ниже всей информации о товаре === #}
+<section class="k-reviews" id="reviews">
+  {# 1) Форма добавления отзыва #}
+  {% include "shop/partials/_review_form.html" with p=p form=review_form %}
+
+  {# 2) Список отзывов (первая страница сервером, дальше — "Показать ещё") #}
+  <div id="reviews-list" class="k-reviews__list">
+    {% include "shop/partials/_review_items.html" with page=reviews_page product=p %}
+  </div>
+
+  {# 3) Кнопка "Показать ещё" и индикатор #}
+  <div id="reviews-more">
+    {% if reviews_page.has_next %}
+      <button
+        class="k-btn k-btn--ghost"
+        hx-get="{% url 'shop:product_review_list' p.slug %}?page={{ reviews_page.next_page_number }}"
+        hx-target="#reviews-list"
+        hx-swap="beforeend"
+        hx-indicator="#reviews-indicator"
+        hx-sync="#reviews:queue"
+        type="button">Показать ещё</button>
+    {% endif %}
+    <span id="reviews-indicator" class="k-htmx-indicator">Загружаем…</span>
+  </div>
+</section>
+{% endwith %}
+
 <script>
   // простая замена превью по клику на миниатюру
   (function(){
@@ -83,5 +116,17 @@
     });
   })();
 </script>
-{% endwith %}
+
+
+<script src="https://unpkg.com/htmx.org@1.9.12"></script>
+<script>
+  // необязательно, но удобно: если сервер вернёт 401, отправим на логин
+  document.body.addEventListener('htmx:responseError', (e)=>{
+    if (e.detail.xhr && e.detail.xhr.status === 401) {
+      window.location.href = "/accounts/login/?next=" + encodeURIComponent(window.location.pathname);
+    }
+  });
+</script>
 {% endblock %}
+
+

@@ -2,7 +2,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.forms import inlineformset_factory, BaseInlineFormSet
 
-from apps.shop.models import Product, ProductImage, ProductTag
+from apps.shop.models import Product, ProductImage, ProductTag, ProductReview
 
 
 class ProductForm(forms.ModelForm):
@@ -73,6 +73,19 @@ ProductImageFormset = inlineformset_factory(
     max_num = 5,
     validate_max = True,
 )
+
+
+
+class ProductReviewForm(forms.ModelForm):
+    class Meta:
+        model = ProductReview
+        fields = ('text',)
+        widgets = {
+            'text': forms.Textarea(attrs={
+                'rows': 4,
+                'placeholder': 'Поделитесь своими впечатлениями о товаре',
+            }),
+        }
 
 
 

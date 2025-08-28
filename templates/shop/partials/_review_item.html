@@ -1,0 +1,22 @@
+{# ожидает: review #}
+<div class="k-review" id="review-{{ review.id }}">
+  <div class="k-review__meta">
+    <span class="k-review__author">{{ review.user|default:"(Удалён)" }}</span>
+    <span class="k-review__date">{{ review.created_at|date:"d.m.Y H:i" }}</span>
+  </div>
+
+  <div class="k-review__text">{{ review.text|linebreaksbr }}</div>
+
+  {% if request.user.is_staff or review.user_id == request.user.id %}
+    <div class="k-review__actions">
+      <button
+        class="k-btn k-btn--ghost"
+        hx-post="{% url 'shop:product_review_delete' review.product.slug review.pk %}"
+        hx-target="#review-{{ review.uuid }}"
+        hx-swap="outerHTML"
+        hx-confirm="Удалить этот отзыв?"
+        hx-sync="#reviews:queue"
+        type="button">Удалить</button>
+    </div>
+  {% endif %}
+</div>

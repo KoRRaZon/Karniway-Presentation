@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.templatetags.static import static
 
-from apps.shop.models import Product, ProductCategory, ProductImage
+from apps.shop.models import Product, ProductCategory, ProductImage, ProductReview
 
 
 @admin.register(ProductCategory)
@@ -79,4 +79,9 @@ class ProductImageAdmin(admin.ModelAdmin):
     list_select_related = ('product',)
     search_fields = ('product__name', 'product__description',)
     autocomplete_fields = ('product',)
+
+
+@admin.register(ProductReview)
+class ProductReviewAdmin(admin.ModelAdmin):
+    pass
 

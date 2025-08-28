@@ -1,0 +1,20 @@
+{# ожидает: p (Product), form (ProductReviewForm) #}
+<div class="k-review-form" id="reviews-form">
+  {% if request.user.is_authenticated %}
+    <form
+      hx-post="{% url 'shop:product_review_create' p.slug %}"
+      hx-target="#reviews-list"
+      hx-swap="afterbegin"
+      hx-sync="#reviews:queue"
+      hx-on="htmx:beforeRequest: this.querySelector('button').disabled=true; htmx:afterRequest: this.reset(); this.querySelector('button').disabled=false">
+      {% csrf_token %}
+      {{ form.text }}
+      <ul class="errorlist nonfield">{% for err in form.non_field_errors %}<li>{{ err }}</li>{% endfor %}</ul>
+      <button class="k-btn" type="submit">Отправить</button>
+    </form>
+  {% else %}
+    <div class="k-hint">
+      Чтобы оставить отзыв, <a href="/accounts/login/?next={{ request.path }}">войдите</a>.
+    </div>
+  {% endif %}
+</div>

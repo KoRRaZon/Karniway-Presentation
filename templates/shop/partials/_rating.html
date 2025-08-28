@@ -1,0 +1,59 @@
+{# ожидает: p (Product), user_vote_value (int|None) #}
+{% with r=p.rating %}
+<div id="rating-block" class="k-rating" hx-target="this" hx-sync="this:queue">
+  <div class="k-rating__left">
+    <span class="k-rating__star" aria-hidden="true">
+      <!-- простая звезда -->
+      <svg viewBox="0 0 24 24" width="18" height="18" class="k-icon">
+        <path d="M12 2l3.09 6.3 6.95 1.01-5.02 4.9 1.19 6.89L12 17.77 5.79 21.1l1.19-6.89-5.02-4.9 6.95-1.01L12 2z"></path>
+      </svg>
+    </span>
+    <span class="k-rating__value">
+      {{ r.rating|default:"3.0" }}
+    </span>
+    <span class="k-rating__votes">
+      👍 {{ r.up_count }} 👎 {{ r.down_count }}
+    </span>
+  </div>
+
+  <div class="k-rating__right">
+    {# лайк #}
+    <button
+      class="k-rate-btn k-rate-btn--up {% if user_vote_value == 1 %}is-active{% endif %}"
+      hx-post="{% url 'shop:product_vote' p.slug %}"
+      hx-vals='{"value": 1}'
+      hx-swap="outerHTML"
+      hx-on="htmx:beforeRequest: this.disabled=true; htmx:afterRequest: this.disabled=false"
+      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+      hx-indicator="#rating-indicator"
+      aria-label="Палец вверх"
+      title="Нравится"
+      type="button"
+    >
+      <svg viewBox="0 0 24 24" width="18" height="18" class="k-icon">
+        <path d="M2 21h4V9H2v12zM22 10c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L13 1 6.59 7.41C6.22 7.78 6 8.3 6 8.86V20c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l2.77-6.49c.06-.15.09-.31.09-.48v-4z"></path>
+      </svg>
+    </button>
+
+    {# дизлайк #}
+    <button
+      class="k-rate-btn k-rate-btn--down {% if user_vote_value == -1 %}is-active{% endif %}"
+      hx-post="{% url 'shop:product_vote' p.slug %}"
+      hx-vals='{"value": -1}'
+      hx-swap="outerHTML"
+      hx-on="htmx:beforeRequest: this.disabled=true; htmx:afterRequest: this.disabled=false"
+      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+      hx-indicator="#rating-indicator"
+      aria-label="Палец вниз"
+      title="Не нравится"
+      type="button"
+    >
+      <svg viewBox="0 0 24 24" width="18" height="18" class="k-icon">
+        <path d="M22 3h-4v12h4V3zM2 14c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L11 23l6.41-6.41c.37-.37.59-.89.59-1.46V4c0-1.1-.9-2-2-2H7C6.17 2 5.46 2.5 5.16 3.22L2.39 9.71c-.06.15-.09.31-.09.48V14z"></path>
+      </svg>
+    </button>
+
+    <span id="rating-indicator" class="k-htmx-indicator" aria-hidden="true">…</span>
+  </div>
+</div>
+{% endwith %}

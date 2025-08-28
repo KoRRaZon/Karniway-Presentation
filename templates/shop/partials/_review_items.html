@@ -1,0 +1,23 @@
+{% for review in page.object_list %}
+  {% include "shop/partials/_review_item.html" with review=review %}
+{% empty %}
+  {% if page.number == 1 %}
+    <div class="k-empty">Пока нет отзывов.</div>
+  {% endif %}
+{% endfor %}
+
+{% if page.has_next %}
+  <div id="reviews-more" hx-swap-oob="true">
+    <button
+      class="k-btn k-btn--ghost"
+      hx-get="{% url 'shop:product_review_list' product.slug %}?page={{ page.next_page_number }}"
+      hx-target="#reviews-list"
+      hx-swap="beforeend"
+      hx-indicator="#reviews-indicator"
+      hx-sync="#reviews:queue"
+      type="button">Показать ещё</button>
+    <span id="reviews-indicator" class="k-htmx-indicator">Загружаем…</span>
+  </div>
+{% else %}
+  <div id="reviews-more" hx-swap-oob="true"></div>
+{% endif %}
