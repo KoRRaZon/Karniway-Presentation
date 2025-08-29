@@ -168,11 +168,12 @@ class ProductReview(IsDeletedModel):
         verbose_name = 'Отзыв на товар'
         verbose_name_plural = 'Отзывы на товары'
         indexes = [
-            models.Index(fields=['product', '-created_at']),
+            models.Index(fields=['product', 'is_deleted', '-created_at']),
         ]
         constraints = [
             models.UniqueConstraint(
                 fields=['product', 'user'],
+                condition=models.Q(is_deleted=False),
                 name='unique_user_review_per_product',
             )
         ]

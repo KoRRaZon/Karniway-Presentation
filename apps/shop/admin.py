@@ -83,5 +83,15 @@ class ProductImageAdmin(admin.ModelAdmin):
 
 @admin.register(ProductReview)
 class ProductReviewAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('product', 'user', 'is_deleted', 'text')
+    list_select_related = ('product', 'user')
+
+    ordering = ('product', 'user', 'is_deleted', 'created_at')
+
+
+
+
+
+    def get_queryset(self, request):
+        return self.model.objects.unfiltered()
 

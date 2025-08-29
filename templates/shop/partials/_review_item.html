@@ -12,11 +12,19 @@
       <button
         class="k-btn k-btn--ghost"
         hx-post="{% url 'shop:product_review_delete' review.product.slug review.pk %}"
-        hx-target="#review-{{ review.uuid }}"
+        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+        hx-target="closest .k-review"
         hx-swap="outerHTML"
         hx-confirm="Удалить этот отзыв?"
         hx-sync="#reviews:queue"
-        type="button">Удалить</button>
+        type="button"
+        title="{% if request.user.is_staff and review.user_id != request.user.id %}Удалить отзыв пользователя {{ review.user|default:'(Удалён)' }}{% else %}Удалить свой отзыв{% endif %}">
+          {% if request.user.is_staff and review.user_id != request.user.id %}
+            Удалить отзыв пользователя {{ review.user|default:"(Удалён)" }}
+          {% else %}
+            Удалить
+          {% endif %}
+      </button>
     </div>
   {% endif %}
 </div>

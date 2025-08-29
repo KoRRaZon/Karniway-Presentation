@@ -131,7 +131,7 @@ class ProductUpdateView(UpdateView):
             return self.render_to_response(context)
 
     def get_success_url(self):
-        return reverse_lazy('product_detail', kwargs={'slug': self.object.slug})
+        return reverse_lazy('shop:product_detail', kwargs={'slug': self.object.slug})
 
 
 class ProductDeleteView(DeleteView):
@@ -310,11 +310,10 @@ class ProductReviewDeleteView(View):
         if not (request.user.is_staff or (review.user_id == request.user.id)):
             return JsonResponse({'detail': 'Forbidden.'}, status=403)
 
-        review.delete()
+        review.delete(hard_delete=True)
 
         if request.headers.get('HX-Request'):
-            # 204 + событие для тоста. Элемент удаляем на клиенте hx-swap="outerHTML"
-            response = HttpResponse(status=204)
+            response = HttpResponse('', status=200)
             response['HX-Trigger'] = json.dumps({'toast': 'Отзыв удален.'})
             return response
 
