@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/shop/product_list.css' %}">
+{% endblock %}
+
+{% block content %}
+<h1>Каталог</h1>
+
+<div class="k-toolbar">
+  <div class="k-left">
+    <span class="k-count">
+      {% if paginator %}Всего: {{ paginator.count }}{% else %}Всего: {{ object_list|length }}{% endif %}
+    </span>
+  </div>
+  <div class="k-right">
+    <a class="k-btn" href="{% url 'shop:product_create' %}">+ Добавить товар</a>
+  </div>
+</div>
+
+{% with items=object_list|default:products %}
+  {% if items %}
+    <div class="k-grid">
+      {% for product in items %}
+        <article class="k-card">
+          <a class="k-thumb" href="{% url 'shop:product_detail' slug=product.slug %}">
+            {# Главное изображение: сначала ищем обложку, иначе берём первое #}
+            {% with imgs=product.images.all %}
+              {% if imgs %}
+                {% with first=imgs.0 %}
+                  {% if first.image %}
+                    <img src="{{ first.image.url }}" alt="{{ product.name }}">
+                  {% endif %}
+                {% endwith %}
+              {% endif %}
+            {% endwith %}
+          </a>
+
+          <div class="k-body">
+            <a class="k-title" href="{% url 'shop:product_detail' slug=product.slug %}">{{ product.name }}</a>
+
+            <div class="k-meta">
+              {% if product.category %}<span class="k-chip">{{ product.category.name }}</span>{% endif %}
+              {% for t in product.tags.all|slice:":3" %}
+                <span class="k-chip k-chip--muted">{{ t.name }}</span>
+              {% endfor %}
+            </div>
+
+            <div class="k-price">
+              {% if product.prom_price %}
+                <span class="k-price-new">{{ product.prom_price }}</span>
+                <span class="k-price-old">{{ product.price }}</span>
+              {% else %}
+                <span class="k-price-new">{{ product.price }}</span>
+              {% endif %}
+            </div>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="k-empty">Пока нет товаров.</p>
+  {% endif %}
+{% endwith %}
+
+{% if is_paginated %}
+  <nav class="k-pagination">
+    {% if page_obj.has_previous %}
+      <a href="?page=1" class="k-page">&laquo;</a>
+      <a href="?page={{ page_obj.previous_page_number }}" class="k-page">&lsaquo;</a>
+    {% else %}
+      <span class="k-page k-page--disabled">&laquo;</span>
+      <span class="k-page k-page--disabled">&lsaquo;</span>
+    {% endif %}
+
+    <span class="k-page k-page--current">
+      {{ page_obj.number }} / {{ paginator.num_pages }}
+    </span>
+
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}" class="k-page">&rsaquo;</a>
+      <a href="?page={{ paginator.num_pages }}" class="k-page">&raquo;</a>
+    {% else %}
+      <span class="k-page k-page--disabled">&rsaquo;</span>
+      <span class="k-page k-page--disabled">&raquo;</span>
+    {% endif %}
+  </nav>
+{% endif %}
+{% endblock %}

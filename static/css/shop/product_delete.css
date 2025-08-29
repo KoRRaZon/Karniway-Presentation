@@ -1,0 +1,80 @@
+:root{
+  --bg:#0f0f10;
+  --panel:#16171a;
+  --text:#eef0f3;
+  --muted:#a8b0bb;
+  --border:#26272b;
+  --danger:#ff6b6b;
+  --danger-2:#cc5454;
+  --shadow: 0 12px 34px rgba(0,0,0,.35);
+  --radius:14px;
+}
+
+h1{ color:var(--text); font-size:28px; margin:10px 0 14px; }
+
+.k-delete{ display:grid; place-items:start; }
+
+.k-card{
+  width:min(780px, 100%);
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:18px;
+  box-shadow:var(--shadow);
+}
+
+.k-warning{
+  color:var(--text);
+  background:rgba(255,107,107,.08);
+  border:1px solid rgba(255,107,107,.35);
+  border-radius:10px;
+  padding:10px 12px;
+  margin-bottom:14px;
+}
+
+.k-preview{
+  border:1px solid var(--border);
+  border-radius:10px;
+  background:#0b0c0d;
+  aspect-ratio: 4/2;
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden;
+  margin-bottom:16px;
+}
+.k-preview img{ width:100%; height:100%; object-fit:cover; }
+.k-noimg{ color:var(--muted); }
+
+.k-alert{ margin:10px 0; padding:10px 12px; border-radius:10px; }
+.k-alert--error{
+  color:var(--danger);
+  background:rgba(255,107,107,.06);
+  border:1px solid rgba(255,107,107,.25);
+}
+
+.k-actions{ display:flex; gap:10px; justify-content:flex-end; }
+
+.k-btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  padding:10px 16px; border-radius:10px; font-weight:600; cursor:pointer;
+  border:1px solid transparent; transition:transform .08s ease, filter .15s ease, box-shadow .2s ease;
+  text-decoration:none;
+}
+.k-btn:active{ transform: translateY(1px); }
+
+.k-btn--ghost{
+  color:var(--text); background:transparent; border:1px dashed var(--border);
+}
+.k-btn--ghost:hover{ border-color:#8ab4f8; color:#8ab4f8; }
+
+.k-btn--danger{
+  color:#0b1220;
+  background: linear-gradient(180deg, var(--danger), #ff8b8b);
+  border-color: var(--danger-2);
+}
+.k-btn--danger:hover{ filter:brightness(1.05); }
+.k-btn--danger:focus-visible{ outline:none; box-shadow: 0 0 0 3px rgba(255,107,107,.25); }
+
+/* адаптив */
+@media (max-width: 720px){
+  .k-card{ padding:14px; }
+}

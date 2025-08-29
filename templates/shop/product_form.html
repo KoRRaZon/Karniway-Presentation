@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/shop/product_form.css' %}">
+{% endblock %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+
+<form method="post" enctype="multipart/form-data" class="k-form">
+  {% csrf_token %}
+
+  {# --- Основные данные товара --- #}
+  <fieldset class="k-fieldset">
+    <legend>Основные данные</legend>
+    {% if form.non_field_errors %}
+      <div class="k-alert k-alert--error">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    {% for field in form %}
+      <div class="k-row">
+        <label class="k-label" for="{{ field.id_for_label }}">{{ field.label }}:</label>
+        <div class="k-control">
+          {{ field }}
+          {% if field.help_text %}<div class="k-help">{{ field.help_text }}</div>{% endif %}
+          {% if field.errors %}
+            <ul class="k-errors">
+              {% for err in field.errors %}<li>{{ err }}</li>{% endfor %}
+            </ul>
+          {% endif %}
+        </div>
+      </div>
+    {% endfor %}
+  </fieldset>
+
+  {# --- Изображения (inline formset) --- #}
+  <fieldset class="k-fieldset">
+    <legend>Изображения</legend>
+
+    {% if images_formset.non_field_errors %}
+      <div class="k-alert k-alert--error">{{ images_formset.non_field_errors }}</div>
+    {% endif %}
+
+    {{ images_formset.management_form }}
+
+    <div id="images-forms" class="k-images">
+      {% for f in images_formset.forms %}
+        <div class="k-image-form">
+          {{ f.id }} {# hidden pk #}
+
+          <div class="k-col">
+            <div class="k-input">
+              {{ f.image.label_tag }} {{ f.image }}
+            </div>
+
+            {% if f.instance.pk and f.instance.image %}
+              <div class="k-preview">
+                <img src="{{ f.instance.image.url }}" alt="">
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="k-col k-col--meta">
+            <label class="k-check">{{ f.is_main }} <span>Обложка</span></label>
+            <div class="k-input">
+              {{ f.position.label_tag }} {{ f.position }}
+            </div>
+            {% if images_formset.can_delete %}
+              <label class="k-check k-check--danger">{{ f.DELETE }} <span>Удалить</span></label>
+            {% endif %}
+
+            {% if f.errors %}
+              <ul class="k-errors">
+                {% for ferr in f.errors.values %}
+                  {% for msg in ferr %}<li>{{ msg }}</li>{% endfor %}
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <button type="button" id="add-image" class="k-btn k-btn--ghost">Добавить ещё</button>
+  </fieldset>
+
+  <div class="k-actions">
+    <button type="submit" class="k-btn">
+      {% if mode == 'update' %}Сохранить изменения{% else %}Сохранить{% endif %}
+    </button>
+  </div>
+</form>
+
+<script>
+/* Ограничиваем обложку: только одна галочка одновременно */
+document.addEventListener('change', (e) => {
+  if (e.target && e.target.name && e.target.name.endsWith('-is_main')) {
+      document.querySelectorAll('input[name$="-is_main"]').forEach(inp => {
+        if (inp !== e.target) inp.checked = false;
+      });
+  }
+});
+
+/* Добавление ещё одной формы изображения (без зависимостей) */
+(function () {
+  const btn = document.getElementById('add-image');
+  if (!btn) return;
+
+  btn.addEventListener('click', function () {
+    const totalInput = document.getElementById('id_productimage_set-TOTAL_FORMS');
+    const container = document.getElementById('images-forms');
+    const total = parseInt(totalInput.value || '0', 10);
+
+    // возьмём последнюю форму как шаблон
+    const last = container.querySelector('.k-image-form:last-child');
+    if (!last) return;
+
+    const clone = last.cloneNode(true);
+
+    // очистка значений
+    clone.querySelectorAll('input').forEach(inp => {
+      if (inp.type === 'file') { inp.value = ''; }
+      else if (inp.type === 'checkbox') { inp.checked = false; }
+      else if (inp.name && inp.name.endsWith('-id')) { inp.value = ''; }
+      else if (inp.name && inp.name.endsWith('-DELETE')) { inp.checked = false; }
+      else { inp.value = ''; }
+    });
+    // убрать превью, если склонировалось
+    clone.querySelectorAll('.k-preview').forEach(p => p.remove());
+
+    // обновить индексы имён/идентификаторов
+    const re = new RegExp(`productimage_set-(\\d+)`, 'g');
+    clone.innerHTML = clone.innerHTML.replaceAll(re, `productimage_set-${total}`);
+
+    container.appendChild(clone);
+    totalInput.value = total + 1;
+  });
+})();
+</script>
+{% endblock %}

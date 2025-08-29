@@ -21,7 +21,8 @@ class PostCategory(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        self.slug = unique_slugify(self, self.name)
+        if not self.slug:
+            self.slug = unique_slugify(self, self.name, self.slug)
         super().save(*args, **kwargs)
 
 
@@ -42,7 +43,8 @@ class Post(IsDeletedModel):
         return self.title
 
     def save(self, *args, **kwargs):
-        self.slug = unique_slugify(self, self.title, self.slug)
+        if not self.slug:
+            self.slug = unique_slugify(self, self.name, self.slug)
         super().save(*args, **kwargs)
 
 
@@ -60,7 +62,8 @@ class News(IsDeletedModel):
         return self.title
 
     def save(self, *args, **kwargs):
-        self.slug = unique_slugify(self, self.title, self.slug)
+        if not self.slug:
+            self.slug = unique_slugify(self, self.name, self.slug)
         super().save(*args, **kwargs)
 
 
@@ -120,7 +123,8 @@ class Creature(IsDeletedModel):
         return self.name
 
     def save(self, *args, **kwargs):
-        self.slug = unique_slugify(self, self.name, self.slug)
+        if not self.slug:
+            self.slug = unique_slugify(self, self.name, self.slug)
         super().save(*args, **kwargs)
 
 
@@ -172,7 +176,8 @@ class SpellCategory(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        self.slug = unique_slugify(self, self.name, self.slug)
+        if not self.slug:
+            self.slug = unique_slugify(self, self.name, self.slug)
         super().save(*args, **kwargs)
 
 class SpellEffect(models.Model):
@@ -189,7 +194,8 @@ class SpellEffect(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        self.slug = unique_slugify(self, self.name, self.slug)
+        if not self.slug:
+            self.slug = unique_slugify(self, self.name, self.slug)
         super().save(*args, **kwargs)
 
 
@@ -240,7 +246,8 @@ class Spell(IsDeletedModel):
         return self.name
 
     def save(self, *args, **kwargs):
-        self.slug = unique_slugify(self, self.name, self.slug)
+        if not self.slug:
+            self.slug = unique_slugify(self, self.name, self.slug)
         super().save(*args, **kwargs)
 
 
