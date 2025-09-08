@@ -1,7 +1,8 @@
 from django.urls import path
 
 from apps.shop.views import ProductDetailView, ProductUpdateView, ProductCreateView, ProductDeleteView, ProductListView, \
-    ProductVoteView, ProductReviewDeleteView, ProductReviewListView, ProductReviewCreateView
+    ProductVoteView, ProductReviewDeleteView, ProductReviewListView, ProductReviewCreateView, CartDetailView, \
+    CartAddView, CartItemIncreaseView, CartItemDecreaseView, CartItemRemoveView
 
 app_name = 'shop'
 
@@ -17,4 +18,10 @@ urlpatterns = [
     path('products/<slug:slug>/reviews/create', ProductReviewCreateView.as_view(), name='product_review_create'),
     path('products/<slug:slug>/reviews/list', ProductReviewListView.as_view(), name='product_review_list'),
     path('products/<slug:slug>/reviews/<uuid:pk>/delete/', ProductReviewDeleteView.as_view(), name='product_review_delete'),
+
+    path('cart', CartDetailView.as_view(), name='cart_detail'),
+    path('cart/add/<slug:slug>/', CartAddView.as_view(), name='cart_add'),
+    path('cart/item/<int:pk>/inc/', CartItemIncreaseView.as_view(), name='cart_item_increase'),
+    path('cart/item/<int:pk>/dec/', CartItemDecreaseView.as_view(), name='cart_item_decrease'),
+    path('cart/item/<int:pk>/remove/', CartItemRemoveView.as_view(), name='cart_item_remove'),
 ]

@@ -137,10 +137,12 @@ class CreatureUpdateView(UpdateView):
     form_class = CreatureForm
     template_name = 'wiki/creature_create.html'
     extra_context = {'title': 'Редактирование существа'}
-    success_url = reverse_lazy('wiki:creature_list')
 
     def get_object(self, **kwargs):
         return Creature.objects.get(slug=self.kwargs['slug'])
+
+    def get_success_url(self):
+        return reverse('wiki:creature_detail', kwargs={'slug': self.object.slug})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -148,7 +150,7 @@ class CreatureUpdateView(UpdateView):
 
         if self.request.method == 'POST':
             context['attack_formset'] = CreatureAttackFormSet(self.request.POST, instance=creature, prefix="attack")
-            context['passive-formset'] = CreaturePassiveFormSet(self.request.POST, instance=creature, prefix="passive")
+            context['passive_formset'] = CreaturePassiveFormSet(self.request.POST, instance=creature, prefix="passive")
         else:
             context['attack_formset'] = CreatureAttackFormSet(instance=creature, prefix="attack")
             context['passive_formset'] = CreaturePassiveFormSet(instance=creature, prefix="passive")

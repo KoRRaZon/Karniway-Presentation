@@ -32,6 +32,26 @@ h1, h2, h3 {
 .flash.error{border-color:#f66; background:#3a2020}
 .flash.warning{border-color:#fc6; background:#3a2f12}
 
+/* 1) Нормализуем типографику у всех контролов формы */
+button, input, select, textarea {
+  font: inherit;        /* наследуем и семейство, и размер, и межстрочный интервал */
+  color: inherit;
+}
+
+/* 2) Убираем нативный вид кнопки, чтобы не вмешивался */
+button.k-btn {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
+/* 3) Фиксируем одинаковые метрики у наших «кнопок» (и <a>, и <button>) */
+.k-btn{
+  font-family: 'Segoe UI', system-ui, -apple-system, Roboto, Arial, sans-serif;
+  font-size: 16px;      /* можно 1rem, если базовый = 16px */
+  line-height: 1;       /* одинаковая высота строки */
+  font-weight: 600;
+}
 
 /* ============================= */
 /*            HEADER            */

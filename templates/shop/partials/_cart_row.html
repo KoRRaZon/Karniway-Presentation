@@ -1,0 +1,89 @@
+{# ожидает: item (CartItem) #}
+{% load static %}
+
+<tr class="k-row" id="item-{{ item.pk }}">
+  <td class="k-prod">
+    <div class="k-prod__box">
+      {# миниатюра — попробуем вывести первую картинку товара, если есть #}
+      {% with img=item.product.images.all.0 %}
+        {% if img and img.image %}
+          <img class="k-thumb" src="{{ img.image.url }}" alt="{{ item.product.name }}">
+        {% else %}
+          <div class="k-thumb k-thumb--placeholder">—</div>
+        {% endif %}
+      {% endwith %}
+
+      <div class="k-prod__meta">
+        <a class="k-prod__name" href="{{ item.product.get_absolute_url }}">{{ item.product.name }}</a>
+        <div class="k-prod__stock">
+          {% if item.product.quantity > 0 %}
+            В наличии: {{ item.product.quantity }}
+          {% else %}
+            Нет в наличии
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </td>
+
+  <td class="k-price">
+    {% with p=item.unit_prom_price|default:item.unit_price %}
+      {% if item.unit_prom_price %}
+        <span class="k-price__new">{{ p|floatformat:2 }}</span>
+        <span class="k-price__old">{{ item.unit_price|floatformat:2 }}</span>
+      {% else %}
+        <span class="k-price__new">{{ p|floatformat:2 }}</span>
+      {% endif %}
+    {% endwith %}
+  </td>
+
+  <td class="k-qty">
+    <form class="k-qty__controls">
+      {% csrf_token %}
+      <button
+        class="k-btn k-btn--ghost"
+        hx-post="{% url 'shop:cart_item_decrease' item.pk %}"
+        hx-include="closest form"
+        hx-target="#item-{{ item.pk }}"
+        hx-swap="outerHTML"
+        hx-indicator="#cart-indicator"
+        aria-label="Уменьшить">–</button>
+
+      <span class="k-qty__value">{{ item.quantity }}</span>
+
+      <button
+        class="k-btn k-btn--ghost"
+        hx-post="{% url 'shop:cart_item_increase' item.pk %}"
+        hx-include="closest form"
+        hx-target="#item-{{ item.pk }}"
+        hx-swap="outerHTML"
+        hx-indicator="#cart-indicator"
+        aria-label="Увеличить">+</button>
+    </form>
+  </td>
+
+  <td class="k-sum">
+    {{ item.total_cost|floatformat:2 }}
+  </td>
+
+  <td class="k-actions">
+    <form>
+      {% csrf_token %}
+      <button
+        class="k-btn k-btn--ghost k-btn--danger"
+        hx-post="{% url 'shop:cart_item_remove' item.pk %}"
+        hx-include="closest form"
+        hx-target="#item-{{ item.pk }}"
+        hx-swap="outerHTML"
+        hx-confirm="Удалить позицию из корзины?"
+        hx-indicator="#cart-indicator">
+        Удалить
+      </button>
+    </form>
+  </td>
+</tr>
+
+{# Просим сервер ещё и обновить блок итога — через OOB swap #}
+<div id="cart-totals" hx-swap-oob="true">
+  {% include "shop/partials/_cart_totals.html" with cart=item.cart %}
+</div>

@@ -44,7 +44,7 @@ class Post(IsDeletedModel):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = unique_slugify(self, self.name, self.slug)
+            self.slug = unique_slugify(self, self.title, self.slug)
         super().save(*args, **kwargs)
 
 
@@ -63,7 +63,7 @@ class News(IsDeletedModel):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = unique_slugify(self, self.name, self.slug)
+            self.slug = unique_slugify(self, self.title, self.slug)
         super().save(*args, **kwargs)
 
 

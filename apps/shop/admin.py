@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 from django.templatetags.static import static
 
-from apps.shop.models import Product, ProductCategory, ProductImage, ProductReview
+from apps.shop.models import Product, ProductCategory, ProductImage, ProductReview, Cart
 
 
 @admin.register(ProductCategory)
@@ -95,3 +95,7 @@ class ProductReviewAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         return self.model.objects.unfiltered()
 
+
+@admin.register(Cart)
+class CartAdmin(admin.ModelAdmin):
+    pass

@@ -1,19 +1,21 @@
 import json
 
+from PIL.DdsImagePlugin import item1
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db import transaction, IntegrityError
 from django.db.models import F
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.http import require_POST
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 
 from apps.shop.forms import ProductForm, ProductImageFormset, ProductReviewForm
-from apps.shop.models import Product, ProductRating, ProductVote, ProductReview
+from apps.shop.models import Product, ProductRating, ProductVote, ProductReview, Cart
+from apps.shop.services import CartService
 
 
 class ProductListView(ListView):
@@ -320,8 +322,134 @@ class ProductReviewDeleteView(View):
         messages.success(request, 'Отзыв удален.')
         return redirect(product.get_absolute_url() + '#reviews')
 
+class CartAddView(View):
+    """
+    Добавление товара в корзину пользователя
+    """
+    def post(self, request, slug):
+        try:
+            product = Product.objects.get(slug=slug)
+        except Product.DoesNotExist:
+            return HttpResponseBadRequest('Неизвестный товар')
+
+        try:
+            quantity = int(request.POST['quantity'])
+        except (TypeError, ValueError):
+            quantity = 1
+        if quantity <= 0:
+            quantity = 1
+
+        try:
+            cart = CartService(request).add(product, quantity)
+        except ValueError:
+            if request.headers.get('HX-Request'):
+                return JsonResponse({'ok': False, 'detail': str(ValueError)}, status=400)
+            messages.error(request, str(ValueError))
+            return redirect(product.get_absolute_url())
+
+        # ответ для HTMX/JSON
+        if request.headers.get('HX-Request') or 'application/json' in request.headers.get('Accept', ''):
+            # здесь можно вернуть маленький HTML-фрагмент “иконки корзины” или просто данные
+            #return JsonResponse({
+                #'ok': True,
+                #'item_count': cart.items.count(),
+                #'cart_id': str(cart.pk),
+            #})
+            response = HttpResponse("Товар добавлен", status=200)
+            response.headers['HX-Trigger'] = json.dumps({
+                "cart:add": {
+                    "item_count": cart.items.count(),
+                    "product": str(product.pk),
+                }
+            })
+            return response
+
+        # возвращаемся на страницу товара
+        messages.success(request, 'Товар добавлен в корзину')
+        return redirect(product.get_absolute_url())
 
 
+class CartDetailView(TemplateView):
+    """
+    Просмотр корзины пользователя
+    """
+    template_name = 'shop/cart_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        service = CartService(self.request)
+        cart = service.get_or_create_cart()
+        items = cart.items.select_related('product')
+        context.update({
+            'cart': cart,
+            'items': items,
+            'title': 'Корзина',
+        })
+        return context
+
+class CartItemIncreaseView(View):
+    """
+    Увеличение количества товара в корзине
+    """
+    http_method_names = ['post']
+
+    def post(self, request, pk):
+        service = CartService(self.request)
+        cart = service.get_or_create_cart()
+        item = cart.items.select_related('product').filter(pk=pk).first()
+        if not item:
+            return JsonResponse({'ok': False, 'detail': 'Товар не найден.'}, status=404)
+
+        # проверка остатков
+        if item.product.quantity < (item.quantity + 1):
+            return JsonResponse({'ok': False, 'detail': 'Недостаточно товара на складе.'}, status=400)
+
+        item.quantity += 1
+        item.save(update_fields=['quantity'])
+        return JsonResponse({'ok': True, 'quantity': item.quantity})
+
+class CartItemDecreaseView(View):
+    """
+    Уменьшение количества товара в корзине
+    """
+    http_method_names = ['post']
+
+    def post(self, request, pk):
+        service = CartService(self.request)
+        cart = service.get_or_create_cart()
+        item = cart.items.select_related('product').filter(pk=pk).first()
+        if not item:
+            return JsonResponse({'ok': False, 'detail': 'Товар не найден.'}, status=404)
+
+        if item.quantity > 1:
+            item.quantity -= 1
+            item.save(update_fields=['quantity'])
+        else:
+            item.delete()
+        return JsonResponse({'ok': True})
+
+class CartItemRemoveView(View):
+    """
+    Удаление товара из корзины
+    """
+    http_method_names = ['post']
+    def post(self, request, pk):
+        service = CartService(self.request)
+        cart = service.get_or_create_cart()
+        item = cart.items.filter(pk=pk).first()
+        if not item:
+            return JsonResponse({'ok': False, 'detail': 'Товар не найден.'}, status=404)
+        item.delete()
+        return JsonResponse({'ok': True})
+
+
+class OrderCreateView(View):
+    """
+    Создание заказа.
+    - GET: Переход на страницу оформления заказа, заполнение Shipping Address, финальная проверка заказа.
+    - POST: Отправка форм, валидация, снапшот Cart/CartItem в Order/OrderItem, Order.status == 'pending'.
+    """
+    pass
 
 
 

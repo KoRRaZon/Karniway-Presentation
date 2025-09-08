@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/shop/cart.css' %}">
+{% endblock %}
+
+{% block content %}
+<h1 class="k-title">{{ title }}</h1>
+
+{% if cart.items.exists %}
+  <div class="k-cart">
+    <table class="k-table">
+      <thead>
+        <tr>
+          <th class="col-product">Товар</th>
+          <th class="col-price">Цена</th>
+          <th class="col-qty">Кол-во</th>
+          <th class="col-sum">Сумма</th>
+          <th class="col-actions"></th>
+        </tr>
+      </thead>
+
+      <tbody id="cart-items">
+        {% for item in items %}
+          {% include "shop/partials/_cart_row.html" with item=item %}
+        {% endfor %}
+      </tbody>
+    </table>
+
+    {% include "shop/partials/_cart_totals.html" with cart=cart %}
+  </div>
+
+  <div class="k-actions">
+    <a class="k-btn" href="#">Оформить заказ</a>
+    <a class="k-btn k-btn--ghost" href="{% url 'shop:product_list' %}">Продолжить покупки</a>
+  </div>
+{% else %}
+  <div class="k-empty">
+    Корзина пуста. <a class="k-link" href="{% url 'shop:product_list' %}">Перейти в каталог</a>.
+  </div>
+{% endif %}
+
+<script src="https://unpkg.com/htmx.org@1.9.12"></script>
+{% endblock %}

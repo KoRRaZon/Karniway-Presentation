@@ -6,7 +6,7 @@
             <a href="/">Главная</a>
             <a href="#">Кампании</a>
             <a href="{% url 'shop:product_list' %}">Магазин</a>
-            <a href="#">Профиль</a>
+            <a href="{% url 'shop:cart_detail' %}">Корзина</a>
         </nav>
 
         {% if user.is_authenticated %}

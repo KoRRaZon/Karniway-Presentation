@@ -184,5 +184,90 @@ class ProductReview(IsDeletedModel):
 
 
 
+class ShippingAddress(IsDeletedModel):
+    """
+    Примерный шаблон всех необходимых данных. В будущем интеграция с почтовыми сервисами и курьерской доставкой.
+    """
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='shipping_address', null=True, blank=True)
+    name = models.CharField('Имя', max_length=30)
+    surname = models.CharField('Фамилия', max_length=30)
+    patronymic = models.CharField('Отчество', max_length=30)
+    phone = models.CharField('Телефон', max_length=20)
+    city = models.CharField('Город', max_length=20)
+    postal_core = models.CharField('Почтовый индекс', max_length=15)
+    address = models.CharField('Улица и номер дома', max_length=100)
+    saved = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.name}'s address"
+
+
+class Cart(models.Model):
+    """
+    Модель корзины, которая будет удаляться после формирования заказа. Черновик для избежания ошибок и конфликтов при изменении товаров во время совершения пользователями покупок.
+    """
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='carts')
+
+    def __str__(self):
+        return f"Cart {self.pk} ({self.user})"
+
+    def total_price(self):
+        return sum(i.total_cost() for i in self.items.all())
+
+class CartItem(models.Model):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
+    product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='cart_items')
+    quantity = models.PositiveIntegerField('Количество', default=1)
+    unit_price = models.DecimalField('Цена', max_digits=10, decimal_places=2)
+    unit_prom_price = models.DecimalField('Акционная цена', max_digits=10, decimal_places=2, blank=True, null=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['cart', 'product'], name='unique_cart_product'),
+            models.CheckConstraint(check=models.Q(quantity__gt=0), name='item_positive_quantity'),
+        ]
+
+    def use_price(self):
+        return self.unit_prom_price if self.unit_prom_price else self.unit_price
+
+    def total_cost(self):
+        return self.use_price() * self.quantity
+
+
+class Order(IsDeletedModel):
+    STATUS = (
+        ('pending', 'Pending'),
+        ('in_work', 'In Work'),
+        ('complete', 'Complete'),
+        ('canceled', 'Canceled'),
+    )
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='orders')
+    shipping_address = models.ForeignKey(ShippingAddress, on_delete=models.PROTECT, related_name='orders')
+    status = models.CharField('Статус заказа', max_length=16, choices=STATUS, default='pending')
+    total_amount = models.DecimalField('Итоговая сумма к оплате', max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f"Order {self.pk} ({self.get_status_display()})"
+
+
+class OrderItem(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
+    product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='order_items')
+    product_name = models.CharField('Наименование товара', max_length=30)
+    unit_price = models.DecimalField(max_digits=10, decimal_places=2)
+    unit_prom_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    unit_final_price = models.DecimalField(max_digits=10, decimal_places=2)
+    quantity = models.PositiveIntegerField(default=1)
+
+    def total_cost(self):
+        return self.unit_final_price * self.quantity
+
+
+
+
+
+
+
+
 
 

@@ -72,19 +72,67 @@ h1{ color:var(--text); font-size:28px; margin:24px 0 12px; }
 .k-stock--ok{ color:var(--success); }
 .k-stock--out{ color:var(--danger); }
 
-.k-actions{ display:flex; gap:10px; }
-.k-btn{
-  display:inline-flex; align-items:center; justify-content:center;
-  padding:10px 16px; border-radius:10px;
-  border:1px solid var(--primary-2);
-  background: linear-gradient(180deg, var(--primary), #6f9be6);
-  color:#0b1220; font-weight:600; cursor:pointer;
+.k-actions{
+    display:flex;
+    align-items: center;
+    gap:10px;
 }
+
+.k-actions form{
+    display:inline-block;
+    margin:0;
+}
+.k-btn{
+    box-sizing: border-box;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+
+    height: 44px;
+    padding:10px 16px;
+    border-radius:10px;
+    min-width: 200px;
+    border-radius: 10px;
+
+    border:1px solid var(--primary-2);
+    background: linear-gradient(180deg, var(--primary), #6f9be6);
+    color:#0b1220;
+    font-weight:600;
+    font-size: 14px;
+    cursor:pointer;
+    text-decoration: none;
+
+    transition:
+    color .15s ease,
+    transform .08s ease,
+    box-shadow .15s ease,
+    border-color .15s ease,
+    background .15s ease;
+}
+
+k-btn:hover {
+    color:#ffffff;
+}
+
+.k-btn:active{
+  transform: scale(0.97);
+}
+
+/* “прозрачная” кнопка (Назад в каталог), размер тот же */
+.k-btn.k-btn--ghost{
+  background:transparent;
+  color:var(--text);
+  border:1px dashed var(--border);
+}
+.k-btn.k-btn--ghost:hover{
+  color:#ffffff;
+  border-color: rgba(255,255,255,.25);
+}
+
 .k-btn--ghost{
   background:transparent; color:var(--text);
   border:1px dashed var(--border);
 }
-
 .k-desc h3{ color:var(--text); margin:6px 0; font-size:18px; }
 .k-desc p{ color:var(--text); opacity:.95; line-height:1.55; }
 

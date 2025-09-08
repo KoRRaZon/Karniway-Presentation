@@ -1,0 +1,11 @@
+{# ожидает: cart #}
+<div class="k-totalbar">
+  <div class="k-totalbar__left">
+    <span class="k-indicator" id="cart-indicator" aria-hidden="true">Загружаем…</span>
+  </div>
+  <div class="k-totalbar__right">
+    <div class="k-total">
+      Итого: <span class="k-total__value">{{ cart.total_price|floatformat:2 }}</span>
+    </div>
+  </div>
+</div>
